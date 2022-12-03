@@ -7,44 +7,24 @@ namespace aoc
     {
         // Calorie Counting: Sum groups of integers, find max
 
-        public static Object PartA(string file)
+        public static (Object a, Object b) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);
-            int max = 0;
-            int sum = 0;
-            foreach(var s in input)
-            {
-                if (s.Length == 0)
-                    sum = 0;
-                else
-                {
-                    sum += Int32.Parse(s);
-                    if (sum > max)
-                        max = sum;
-                }
-            }
-            return max;
-        }
-
-        public static Object PartB(string file)
-        {
-            var input = ReadInput.Strings(Day, file);
-            List<int> max = new();
+            input.Add("");
+            List<int> group = new();
             int sum = 0;
             foreach (var s in input)
-            {
                 if (s.Length == 0)
                 {
-                    max.Add(sum);
+                    group.Add(sum);
                     sum = 0;
                 }
                 else
-                    sum += Int32.Parse(s); 
-            }
-            return max.OrderByDescending(x => x).Take(3).Sum();
+                    sum += Int32.Parse(s);
+            var sorted = group.OrderByDescending(x => x);
+            return (sorted.First(), sorted.Take(3).Sum());
         }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

@@ -1,7 +1,4 @@
 ﻿using AdventOfCode;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace aoc
@@ -10,49 +7,25 @@ namespace aoc
     {
         // Rock Paper Scissors: Handle game logics, get confused
 
-        public static Object PartA(string file)
+        public static (Object, Object) DoPuzzle(string file)
         {
-            var pointsOwn = new List<int>() { 1, 2, 3 };
-            var pointsWin = new Dictionary<int, int>() { { -2, 0 }, { -1, 6 }, { 0, 3 }, { 1, 0 }, {2, 6} };
+            var round = new List<int>() { 3, 0, 6 };
+            var bselect = new List<int>() { -1, 0, 1 };
+            var bend = new List<int>() { 0, 3, 6 };
             var input = ReadInput.Strings(Day, file);
-            int sum = 0;
+            int asum = 0;
+            int bsum = 0;
             foreach (var s in input)
             {
-                var s1 = s.Replace("A", "0").Replace("X", "0");
-                var s2 = s1.Replace("B", "1").Replace("Y", "1");
-                var s3 = s2.Replace("C", "2").Replace("Z", "2");
-                var v = s3.Split(" ").Select(int.Parse).ToList();
-                int delta = v[0] - v[1];
-                int pOwn = pointsOwn[v[1]];
-                int pWin = pointsWin[delta];
-                sum += pOwn + pWin;
+                int t = "ABC".IndexOf(s[0]);
+                int u = "XYZ".IndexOf(s[2]);
+                asum += u + 1 + round[(t - u + 3) % 3];
+                int bown = (t + bselect[u] + 3) % 3 + 1;
+                bsum += bown + bend[u];
             }
-            return sum;
+            return (asum, bsum);
         }
-
-        public static Object PartB(string file)
-        {
-            var pointsOwn = new List<int>() { 1, 2, 3 };
-            var pointsSelect = new List<int>() { -1, 0, 1 };
-            var pointsEnd = new List<int>() { 0, 3, 6 };
-            var input = ReadInput.Strings(Day, file);
-            int sum = 0;
-            foreach (var s in input)
-            {
-                var s1 = s.Replace("A", "0").Replace("X", "0");
-                var s2 = s1.Replace("B", "1").Replace("Y", "1");
-                var s3 = s2.Replace("C", "2").Replace("Z", "2");
-                var v = s3.Split(" ").Select(int.Parse).ToList();
-                int ownIdx = (v[0] + pointsSelect[v[1]] + 3) % 3;
-                int pOwn = pointsOwn[ownIdx];
-                int endIdx = v[1];
-                int pEnd = pointsEnd[endIdx];
-                sum += pOwn + pEnd;
-            }
-            return sum;
-        }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

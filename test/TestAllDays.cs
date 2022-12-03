@@ -11,24 +11,28 @@ namespace test
     public class TestDay01
     {
         [Fact]
-        public void ExampleA() => Assert.Equal(24000, aoc.Day01.PartA(Input.example));
+        public void Example() => Assert.Equal((24000, 45000), aoc.Day01.DoPuzzle(Input.example));
         [Fact]
-        public void TestA() => Assert.Equal(70698, aoc.Day01.PartA(Input.actual));
-        [Fact]
-        public void ExampleB() => Assert.Equal(41000, aoc.Day01.PartB(Input.example));
-        [Fact]
-        public void TestB() => Assert.Equal(206643, aoc.Day01.PartB(Input.actual));
+        public void Test() => Assert.Equal((70698, 206643), aoc.Day01.DoPuzzle(Input.actual));
     }
 
     public class TestDay02
     {
         [Fact]
-        public void ExampleA() => Assert.Equal(15, aoc.Day02.PartA(Input.example));
+        public void Example() => Assert.Equal((15, 12), aoc.Day02.DoPuzzle(Input.example));
         [Fact]
-        public void TestA() => Assert.Equal(13526, aoc.Day02.PartA(Input.actual));
+        public void Test() => Assert.Equal((13526, 14204), aoc.Day02.DoPuzzle(Input.actual));
+    }
+
+    public class TestDay03
+    {
         [Fact]
-        public void ExampleB() => Assert.Equal(12, aoc.Day02.PartB(Input.example));
+        public void ExampleA() => Assert.Equal(157, aoc.Day03.PartA(Input.example));
         [Fact]
-        public void TestB() => Assert.Equal(14204, aoc.Day02.PartB(Input.actual));
+        public void TestA() => Assert.Equal(8401, aoc.Day03.PartA(Input.actual));
+        [Fact]
+        public void ExampleB() => Assert.Equal(70, aoc.Day03.PartB(Input.example));
+        [Fact]
+        public void TestB() => Assert.Equal(2641, aoc.Day03.PartB(Input.actual));
     }
 }
