@@ -8,7 +8,7 @@ namespace aoc
 {
     public class Day02
     {
-        // Today: 
+        // Rock Paper Scissors: Handle game logics, get confused
 
         public static Object PartA(string file)
         {
