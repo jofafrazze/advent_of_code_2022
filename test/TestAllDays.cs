@@ -27,12 +27,16 @@ namespace test
     public class TestDay03
     {
         [Fact]
-        public void ExampleA() => Assert.Equal(157, aoc.Day03.PartA(Input.example));
+        public void Example() => Assert.Equal((157, 70), aoc.Day03.DoPuzzle(Input.example));
         [Fact]
-        public void TestA() => Assert.Equal(8401, aoc.Day03.PartA(Input.actual));
-        [Fact]
-        public void ExampleB() => Assert.Equal(70, aoc.Day03.PartB(Input.example));
-        [Fact]
-        public void TestB() => Assert.Equal(2641, aoc.Day03.PartB(Input.actual));
+        public void Test() => Assert.Equal((8401, 2641), aoc.Day03.DoPuzzle(Input.actual));
     }
+    public class TestDay04
+    {
+        [Fact]
+        public void Example() => Assert.Equal((2, 4), aoc.Day04.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((536, 845), aoc.Day04.DoPuzzle(Input.actual));
+    }
+
 }

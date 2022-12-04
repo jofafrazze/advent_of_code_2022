@@ -1,28 +1,23 @@
 ﻿using AdventOfCode;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace aoc
 {
     public class Day04
     {
-        // Today: 
-
-        public static Object PartA(string file)
+        // Camp Cleanup: Find ranges that do (or do not) overlap
+        public static (Object, Object) DoPuzzle(string file)
         {
-            var input = ReadInput.Ints(Day, file);
-            return 0;
+            int asum = 0, bsum = 0;
+            foreach (var s in ReadInput.Strings(Day, file))
+            {
+                var v = s.Split('-', ',').Select(int.Parse).ToList();
+                asum += ((v[0] >= v[2] && v[1] <= v[3]) || (v[0] <= v[2] && v[1] >= v[3])) ? 1 : 0;
+                bsum += (v[1] < v[2] || v[0] > v[3]) ? 0 : 1;
+            }
+            return (asum, bsum);
         }
-
-        public static Object PartB(string file)
-        {
-            var v = ReadInput.Strings(Day, file);
-            return 0;
-        }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

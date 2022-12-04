@@ -10,19 +10,15 @@ namespace aoc
     {
         // Today: 
 
-        public static Object PartA(string file)
+        public static (Object a, Object b) DoPuzzle(string file)
         {
-            var input = ReadInput.Ints(Day, file);
-            return 0;
+            //var z = ReadData(file);
+            var z = ReadInput.Strings(Day, file);
+            //Console.WriteLine("A is {0}", a);
+            return (0, 0);
         }
 
-        public static Object PartB(string file)
-        {
-            var v = ReadInput.Strings(Day, file);
-            return 0;
-        }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

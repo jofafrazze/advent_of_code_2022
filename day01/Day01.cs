@@ -6,7 +6,6 @@ namespace aoc
     public class Day01
     {
         // Calorie Counting: Sum groups of integers, find max
-
         public static (Object a, Object b) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);

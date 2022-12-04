@@ -1,66 +1,32 @@
 ﻿using AdventOfCode;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace aoc
 {
     public class Day03
     {
-        // Today: 
-
-        public static Object PartA(string file)
+        // Rucksack Reorganization: Find intersection between groups
+        public static int Priority(char c) => c + (char.IsUpper(c) ? 27 - 'A' : 1 - 'a');
+        public static (Object, Object) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);
-            int sum = 0;
-            int n = 0;
-            foreach (var item in input)
+            int asum = 0, bsum = 0;
+            foreach (var s in input)
             {
-                n++;
-                int len = item.Length / 2;
-                var a = item.Substring(0, len);
-                var b = item[len..];
-                foreach (char c in a)
-                {
-                    if (b.Contains(c))
-                    {
-                        int up = c - 'A' + 27;
-                        int lo = c - 'a' + 1;
-                        sum += char.IsUpper(c) ? up : lo;
-                        break;
-                    }
-                }
-            }
-            return sum;
-        }
+                int n = s.Length / 2;
+                asum += Priority(s[..n].Intersect(s[n..]).First());
 
-        public static Object PartB(string file)
-        {
-            var input = ReadInput.Strings(Day, file);
-            int sum = 0;
-            int n = 0;
-            var todo = new List<String>(input);
-            while (todo.Count > 0)
+            }
+            int pos = 0;
+            while (pos < input.Count)
             {
-                n++;
-                var group = todo.Take(3).ToList();
-                todo.RemoveRange(0, 3);
-                foreach (char c in group[0])
-                {
-                    if (group[1].Contains(c) && group[2].Contains(c))
-                    {
-                        int up = c - 'A' + 27;
-                        int lo = c - 'a' + 1;
-                        sum += char.IsUpper(c) ? up : lo;
-                        break;
-                    }
-                }
+                var g = input.Skip(pos).Take(3).ToList();
+                bsum += Priority(g[0].Intersect(g[1]).Intersect(g[2]).First());
+                pos += 3;
             }
-            return sum;
+            return (asum, bsum);
         }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }
