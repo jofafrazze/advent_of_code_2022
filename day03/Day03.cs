@@ -10,14 +10,13 @@ namespace aoc
         public static (Object, Object) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);
-            int asum = 0, bsum = 0;
+            int asum = 0, bsum = 0, pos = 0;
             foreach (var s in input)
             {
                 int n = s.Length / 2;
                 asum += Priority(s[..n].Intersect(s[n..]).First());
 
             }
-            int pos = 0;
             while (pos < input.Count)
             {
                 var g = input.Skip(pos).Take(3).ToList();

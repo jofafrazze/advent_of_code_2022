@@ -38,5 +38,18 @@ namespace test
         [Fact]
         public void Test() => Assert.Equal((536, 845), aoc.Day04.DoPuzzle(Input.actual));
     }
-
+    public class TestDay05
+    {
+        [Fact]
+        public void Example() => Assert.Equal(("CMZ", "MCD"), aoc.Day05.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal(("ZBDRNPMVH", "WDLPFNNNB"), aoc.Day05.DoPuzzle(Input.actual));
+    }
+    public class TestDay06
+    {
+        [Fact]
+        public void Example() => Assert.Equal((7, 19), aoc.Day06.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((1702, 3559), aoc.Day06.DoPuzzle(Input.actual));
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode
 {
@@ -893,6 +894,10 @@ namespace AdventOfCode
             return File.ReadAllLines(ReadInput.GetPath(day, file)).ToList();
         }
 
+        public static List<List<string>> StringGroups(string day, string file)
+        {
+            return Extract.SplitBy(Strings(day, file), "").ToList();
+        }
         public static List<List<string>> StringLists(string day, string file, string delimiter = " ")
         {
             return Strings(day, file).Select(x => x.Split(delimiter).ToList()).ToList();
@@ -908,6 +913,32 @@ namespace AdventOfCode
             var v = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             return v.Select(x => Convert.ToInt64(x, base_)).ToArray();
         }
+        public static String[] RegexRemove(string s, string pattern = "[^0-9- ]", char replace = ' ')
+        {
+            Regex rgx = new Regex(pattern);
+            s = rgx.Replace(s, replace.ToString());
+            return s.Split(replace, StringSplitOptions.RemoveEmptyEntries).ToArray();
+        }
+        public static IEnumerable<List<T>> SplitBy<T>(this IEnumerable<T> source, T split, 
+            bool skipEmptyGroups = true) where T : IEquatable<T>
+        {
+            var group = new List<T>();
+            foreach (var item in source)
+                if (split.Equals(item))
+                {
+                    if (group.Count > 0 || !skipEmptyGroups)
+                    {
+                        yield return group;
+                        group = new List<T>();
+                    }
+                }
+                else
+                    group.Add(item);
+            if (group.Count > 0 || !skipEmptyGroups)
+                yield return group;
+        }
+        public static IEnumerable<IEnumerable<T>> Transpose<T>(IEnumerable<IEnumerable<T>> list) =>
+            Enumerable.Range(0, list.First().Count()).Select(x => list.Select(y => y.ElementAt(x)));
     }
     public static class Aoc
     {

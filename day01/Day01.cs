@@ -8,11 +8,9 @@ namespace aoc
         // Calorie Counting: Sum groups of integers, find max
         public static (Object a, Object b) DoPuzzle(string file)
         {
-            var input = ReadInput.Strings(Day, file);
-            input.Add("");
             List<int> group = new();
             int sum = 0;
-            foreach (var s in input)
+            foreach (var s in ReadInput.Strings(Day, file).Append(""))
                 if (s.Length == 0)
                 {
                     group.Add(sum);
