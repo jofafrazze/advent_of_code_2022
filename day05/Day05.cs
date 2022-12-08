@@ -22,6 +22,7 @@ namespace aoc
         public static (Object a, Object b) DoPuzzle(string file)
         {
             var input = ReadInput.StringGroups(Day, file);
+            // Sorry for Wall of linq
             var cratesInput = input[0].AsEnumerable().Reverse().Skip(1).ToList();
             var cratesLists = Extract.Transpose(cratesInput.Select(s => s.Where((c, i) => (i - 1) % 4 == 0)));
             var crates = cratesLists.Select(s => new Stack<char>(s.Where(c => c != ' ').Reverse())).ToList();
