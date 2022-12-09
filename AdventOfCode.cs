@@ -53,47 +53,47 @@ namespace AdventOfCode
         }
         public static GenericPosition2D<T> operator +(GenericPosition2D<T> p1, GenericPosition2D<T> p2)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Add(p.x, p2.x);
             p.y = Extensions.Add(p.y, p2.y);
             return p;
         }
         public static GenericPosition2D<T> operator -(GenericPosition2D<T> p1, T k)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Subtract(p.x, k);
             p.y = Extensions.Subtract(p.y, k);
             return p;
         }
         public static GenericPosition2D<T> operator -(GenericPosition2D<T> p1, GenericPosition2D<T> p2)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Subtract(p.x, p2.x);
             p.y = Extensions.Subtract(p.y, p2.y);
             return p;
         }
         public static GenericPosition2D<T> operator *(GenericPosition2D<T> p1, T k)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Multiply(p.x, k);
             p.y = Extensions.Multiply(p.y, k);
             return p;
         }
         public static GenericPosition2D<T> operator *(GenericPosition2D<T> p1, GenericPosition2D<T> p2)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Multiply(p.x, p2.x);
             p.y = Extensions.Multiply(p.y, p2.y);
             return p;
         }
         public static GenericPosition2D<T> operator /(GenericPosition2D<T> p1, T k)
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(p1);
+            GenericPosition2D<T> p = new(p1);
             p.x = Extensions.Divide(p.x, k);
             p.y = Extensions.Divide(p.y, k);
             return p;
         }
-        public T ManhattanDistance(GenericPosition2D<T> p = new GenericPosition2D<T>())
+        public T ManhattanDistance(GenericPosition2D<T> p = new())
         {
             return Extensions.Add(
                 Extensions.Abs(Extensions.Subtract(x, p.x!)),
@@ -105,10 +105,10 @@ namespace AdventOfCode
             return new GenericPosition2D<T>(y, x);
         }
         // Rotates pos n steps clock-wize around center
-        public static GenericPosition2D<T> Rotate4Steps(GenericPosition2D<T> pos, int n, GenericPosition2D<T> center = new GenericPosition2D<T>())
+        public static GenericPosition2D<T> Rotate4Steps(GenericPosition2D<T> pos, int n, GenericPosition2D<T> center = new())
         {
-            GenericPosition2D<T> p = new GenericPosition2D<T>(pos - center);
-            GenericPosition2D<T> r = new GenericPosition2D<T>(p);
+            GenericPosition2D<T> p = new(pos - center);
+            GenericPosition2D<T> r = new(p);
             n = Utils.Modulo(n, 4);
             if (n == 1)
             {
@@ -187,7 +187,7 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator +(GenericPosition3D<T> p1, GenericPosition3D<T> p2)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Add(p.x, p2.x);
             p.y = Extensions.Add(p.y, p2.y);
             p.z = Extensions.Add(p.z, p2.z);
@@ -195,7 +195,7 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator -(GenericPosition3D<T> p1, T k)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Subtract(p.x, k);
             p.y = Extensions.Subtract(p.y, k);
             p.z = Extensions.Subtract(p.z, k);
@@ -203,7 +203,7 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator -(GenericPosition3D<T> p1, GenericPosition3D<T> p2)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Subtract(p.x, p2.x);
             p.y = Extensions.Subtract(p.y, p2.y);
             p.z = Extensions.Subtract(p.z, p2.z);
@@ -211,7 +211,7 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator *(GenericPosition3D<T> p1, T k)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Multiply(p.x, k);
             p.y = Extensions.Multiply(p.y, k);
             p.z = Extensions.Multiply(p.z, k);
@@ -219,7 +219,7 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator *(GenericPosition3D<T> p1, GenericPosition3D<T> p2)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Multiply(p.x, p2.x);
             p.y = Extensions.Multiply(p.y, p2.y);
             p.z = Extensions.Multiply(p.z, p2.z);
@@ -227,13 +227,13 @@ namespace AdventOfCode
         }
         public static GenericPosition3D<T> operator /(GenericPosition3D<T> p1, T k)
         {
-            GenericPosition3D<T> p = new GenericPosition3D<T>(p1);
+            GenericPosition3D<T> p = new(p1);
             p.x = Extensions.Divide(p.x, k);
             p.y = Extensions.Divide(p.y, k);
             p.z = Extensions.Divide(p.z, k);
             return p;
         }
-        public T ManhattanDistance(GenericPosition3D<T> p = new GenericPosition3D<T>())
+        public T ManhattanDistance(GenericPosition3D<T> p = new())
         {
             return Extensions.Add(
                 Extensions.Abs(Extensions.Subtract(x, p.x!)),
@@ -250,7 +250,7 @@ namespace AdventOfCode
         public GenericPosition2D<int> pos;
         public char[,] data;
 
-        public Map(int w, int h, char fill, GenericPosition2D<int> p = new GenericPosition2D<int>())
+        public Map(int w, int h, char fill, GenericPosition2D<int> p = new())
         {
             width = w;
             height = h;
@@ -277,7 +277,7 @@ namespace AdventOfCode
         {
             int w = list[0].Length;
             int h = list.Count;
-            Map m = new Map(w, h, ' ');
+            Map m = new(w, h, ' ');
             for (int y = 0; y < h; y++)
                 for (int x = 0; x < w; x++)
                     m.data[x, y] = list[y][x];
@@ -301,7 +301,7 @@ namespace AdventOfCode
             return p.x >= 0 && p.x < width && p.y >= 0 && p.y < height;
         }
 
-        public List<GenericPosition2D<int>> Positions(GenericPosition2D<int> p0 = new GenericPosition2D<int>(), int w0 = 0, int h0 = 0)
+        public List<GenericPosition2D<int>> Positions(GenericPosition2D<int> p0 = new(), int w0 = 0, int h0 = 0)
         {
             int w = (w0 < 1) ? width - p0.x : w0;
             int h = (h0 < 1) ? height - p0.y : h0;
@@ -314,9 +314,7 @@ namespace AdventOfCode
 
         public void Switch(GenericPosition2D<int> p1, GenericPosition2D<int> p2)
         {
-            var a = this[p1];
-            this[p1] = this[p2];
-            this[p2] = a;
+            (this[p2], this[p1]) = (this[p1], this[p2]);
         }
 
         public void Expand(int n, char fill) { Expand(n, n, n, n, fill); }
@@ -324,8 +322,8 @@ namespace AdventOfCode
         {
             int w = left + right + width;
             int h = top + bottom + height;
-            GenericPosition2D<int> s = new GenericPosition2D<int>(pos.x + left, pos.y + top);
-            Map m = new Map(w, h, fill, s);
+            GenericPosition2D<int> s = new(pos.x + left, pos.y + top);
+            Map m = new(w, h, fill, s);
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                     m.data[x + left, y + top] = data[x, y];
@@ -340,7 +338,7 @@ namespace AdventOfCode
             string s = "";
             for (int y = 0; y < height; y++)
             {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 for (int x = 0; x < width; x++)
                 {
                     sb.Append(data[x, y]);
@@ -365,7 +363,7 @@ namespace AdventOfCode
 
         public bool Equals(Map? other)
         {
-            return !(other is null) &&
+            return other is not null &&
                    width == other.width &&
                    height == other.height &&
                    data.Cast<char>().SequenceEqual(other.data.Cast<char>());
@@ -390,57 +388,64 @@ namespace AdventOfCode
 
     public static class CoordsRC
     {
-        public static readonly GenericPosition2D<int> goUpLeft = new GenericPosition2D<int>(-1, -1);
-        public static readonly GenericPosition2D<int> goUp = new GenericPosition2D<int>(0, -1);
-        public static readonly GenericPosition2D<int> goUpRight = new GenericPosition2D<int>(1, -1);
-        public static readonly GenericPosition2D<int> goRight = new GenericPosition2D<int>(1, 0);
-        public static readonly GenericPosition2D<int> goDownRight = new GenericPosition2D<int>(1, 1);
-        public static readonly GenericPosition2D<int> goDown = new GenericPosition2D<int>(0, 1);
-        public static readonly GenericPosition2D<int> goDownLeft = new GenericPosition2D<int>(-1, 1);
-        public static readonly GenericPosition2D<int> goLeft = new GenericPosition2D<int>(-1, 0);
-        public static readonly List<GenericPosition2D<int>> directions4 = new List<GenericPosition2D<int>>()
+        public static readonly GenericPosition2D<int> upLeft = new(-1, -1);
+        public static readonly GenericPosition2D<int> up = new(0, -1);
+        public static readonly GenericPosition2D<int> upRight = new(1, -1);
+        public static readonly GenericPosition2D<int> right = new(1, 0);
+        public static readonly GenericPosition2D<int> downRight = new(1, 1);
+        public static readonly GenericPosition2D<int> down = new(0, 1);
+        public static readonly GenericPosition2D<int> downLeft = new(-1, 1);
+        public static readonly GenericPosition2D<int> left = new(-1, 0);
+        public static readonly List<GenericPosition2D<int>> directions4 = new()
         {
-            goUp, goRight, goDown, goLeft
+            up, right, down, left
         };
-        public static readonly List<GenericPosition2D<int>> directions8 = new List<GenericPosition2D<int>>()
+        public static readonly List<GenericPosition2D<int>> directions8 = new()
         {
-            goUpLeft, goUp, goUpRight, goRight, goDownRight, goDown, goDownLeft, goLeft
+            up, upRight, right, downRight, down, downLeft, left, upLeft
         };
         public static List<GenericPosition2D<int>> Neighbours4(GenericPosition2D<int> p) =>
             CoordsRC.directions4.Select(x => p + x).ToList();
         public static List<GenericPosition2D<int>> Neighbours8(GenericPosition2D<int> p) =>
             CoordsRC.directions8.Select(x => p + x).ToList();
 
-        public static readonly List<GenericPosition2D<int>> d8 = new List<GenericPosition2D<int>>()
+        public static readonly List<GenericPosition2D<int>> directions8lrtd = new()
         {
-            goUpLeft, goUp, goUpRight, goLeft, goRight, goDownLeft, goDown, goDownRight
+            upLeft, up, upRight, left, right, downLeft, down, downRight
         };
-        public static List<GenericPosition2D<int>> N8(GenericPosition2D<int> p) =>
-            CoordsRC.d8.Select(x => p + x).ToList();
+        public static List<GenericPosition2D<int>> Neighbours8lrtd(GenericPosition2D<int> p) =>
+            CoordsRC.directions8lrtd.Select(x => p + x).ToList();
     }
 
     public static class CoordsXY
     {
-        public static readonly GenericPosition2D<int> goUpLeft = new GenericPosition2D<int>(-1, 1);
-        public static readonly GenericPosition2D<int> goUp = new GenericPosition2D<int>(0, 1);
-        public static readonly GenericPosition2D<int> goUpRight = new GenericPosition2D<int>(1, 1);
-        public static readonly GenericPosition2D<int> goRight = new GenericPosition2D<int>(1, 0);
-        public static readonly GenericPosition2D<int> goDownRight = new GenericPosition2D<int>(1, -1);
-        public static readonly GenericPosition2D<int> goDown = new GenericPosition2D<int>(0, -1);
-        public static readonly GenericPosition2D<int> goDownLeft = new GenericPosition2D<int>(-1, -1);
-        public static readonly GenericPosition2D<int> goLeft = new GenericPosition2D<int>(-1, 0);
-        public static readonly List<GenericPosition2D<int>> directions4 = new List<GenericPosition2D<int>>()
+        public static readonly GenericPosition2D<int> upLeft = new(-1, 1);
+        public static readonly GenericPosition2D<int> up = new(0, 1);
+        public static readonly GenericPosition2D<int> upRight = new(1, 1);
+        public static readonly GenericPosition2D<int> right = new(1, 0);
+        public static readonly GenericPosition2D<int> downRight = new(1, -1);
+        public static readonly GenericPosition2D<int> down = new(0, -1);
+        public static readonly GenericPosition2D<int> downLeft = new(-1, -1);
+        public static readonly GenericPosition2D<int> left = new(-1, 0);
+        public static readonly List<GenericPosition2D<int>> directions4 = new()
         {
-            goUp, goRight, goDown, goLeft
+            up, right, down, left
         };
-        public static readonly List<GenericPosition2D<int>> directions8 = new List<GenericPosition2D<int>>()
+        public static readonly List<GenericPosition2D<int>> directions8 = new()
         {
-            goUpLeft, goUp, goUpRight, goRight, goDownRight, goDown, goDownLeft, goLeft
+            up, upRight, right, downRight, down, downLeft, left, upLeft
         };
         public static List<GenericPosition2D<int>> Neighbours4(GenericPosition2D<int> p) =>
             CoordsXY.directions4.Select(x => p + x).ToList();
         public static List<GenericPosition2D<int>> Neighbours8(GenericPosition2D<int> p) =>
             CoordsXY.directions8.Select(x => p + x).ToList();
+
+        public static readonly List<GenericPosition2D<int>> directions8lrtd = new()
+        {
+            upLeft, up, upRight, left, right, downLeft, down, downRight
+        };
+        public static List<GenericPosition2D<int>> Neighbours8lrtd(GenericPosition2D<int> p) =>
+            CoordsRC.directions8lrtd.Select(x => p + x).ToList();
     }
 
     public static class CoordsHex
@@ -458,7 +463,7 @@ namespace AdventOfCode
         // - Horizontal neighbors have same x +- 2 and same y
         // - Diagonal neighbors have x +- 1 and y +- 1
         // 
-        public static readonly Dictionary<string, GenericPosition2D<int>> directionsHigh = new Dictionary<string, GenericPosition2D<int>>()
+        public static readonly Dictionary<string, GenericPosition2D<int>> directionsHigh = new()
         {
             { "n", new GenericPosition2D<int>(0, -2) },
             { "ne", new GenericPosition2D<int>(1, -1) },
@@ -467,7 +472,7 @@ namespace AdventOfCode
             { "sw", new GenericPosition2D<int>(-1, 1) },
             { "nw", new GenericPosition2D<int>(-1, -1) },
         };
-        public static readonly Dictionary<string, GenericPosition2D<int>> directionsWide = new Dictionary<string, GenericPosition2D<int>>()
+        public static readonly Dictionary<string, GenericPosition2D<int>> directionsWide = new()
         {
             { "ne", new GenericPosition2D<int>(1, -1) },
             { "e", new GenericPosition2D<int>(2, 0) },
@@ -520,7 +525,7 @@ namespace AdventOfCode
         // Least Common Multiple i.e. Lowest Common Denominator (LCD)
         public static long LCM(long a, long b)
         {
-            return (a / GCF(a, b)) * b;
+            return a / GCF(a, b) * b;
         }
 
         // g = ax + by = gcd(a, b)
@@ -531,7 +536,7 @@ namespace AdventOfCode
             else
             {
                 (long g, long y, long x) = EGCD(b % a, a);
-                return (g, x - (b / a) * y, y);
+                return (g, x - b / a * y, y);
             }
         }
 
@@ -539,7 +544,7 @@ namespace AdventOfCode
         {
             (long g, long x, _) = EGCD(a, m);
             if (g != 1)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentException("ModInverse bad input!");
             return x % m;
         }
 
@@ -561,13 +566,8 @@ namespace AdventOfCode
     {
         public static List<List<T>> HeapPermutation<T>(IList<T> a)
         {
-            List<List<T>> result = new List<List<T>>();
-            void Swap(ref List<T> b, int i1, int i2)
-            {
-                T temp = b[i1];
-                b[i1] = b[i2];
-                b[i2] = temp;
-            }
+            List<List<T>> result = new();
+            void Swap(ref List<T> b, int i1, int i2) => (b[i2], b[i1]) = (b[i1], b[i2]);
             void Permute(ref List<T> b, int size)
             {
                 if (size == 1)
@@ -584,7 +584,7 @@ namespace AdventOfCode
                     Permute(ref b, size - 1);
                 }
             }
-            List<T> copy = new List<T>(a);
+            List<T> copy = new(a);
             Permute(ref copy, copy.Count);
             return result;
         }
@@ -595,10 +595,10 @@ namespace AdventOfCode
         }
         public static List<List<T>> GetCombinations<T>(IList<T> input, int maxLength)
         {
-            List<List<T>> results = new List<List<T>>();
+            List<List<T>> results = new();
             for (int i = 0; i < input.Count; i++)
             {
-                List<T> current = new List<T>() { input[i] };
+                List<T> current = new() { input[i] };
                 int size = results.Count;
                 for (int r = 0; r < size; r++)
                 {
@@ -665,9 +665,7 @@ namespace AdventOfCode
 
         public static void Inc<T, U>(this Dictionary<T, U> dictionary, T key, U value) where T : notnull where U : notnull
         {
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             dictionary[key] = Add(dictionary.GetValueOrDefault(key, default!), value!)!;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         }
 
         public static Dictionary<T, int> Counter<T>(this IEnumerable<T> elements) where T : notnull
@@ -762,21 +760,21 @@ namespace AdventOfCode
 
         public static HashSet<T> Union<T>(HashSet<T> a, HashSet<T> b)
         {
-            HashSet<T> c = new HashSet<T>(a);
+            HashSet<T> c = new(a);
             c.UnionWith(b);
             return c;
         }
 
         public static HashSet<T> Intersection<T>(HashSet<T> a, HashSet<T> b)
         {
-            HashSet<T> c = new HashSet<T>(a);
+            HashSet<T> c = new(a);
             c.IntersectWith(b);
             return c;
         }
 
         public static HashSet<T> Difference<T>(HashSet<T> a, HashSet<T> b)
         {
-            HashSet<T> c = new HashSet<T>(a);
+            HashSet<T> c = new(a);
             c.ExceptWith(b);
             return c;
         }
@@ -790,10 +788,10 @@ namespace AdventOfCode
             }
             else
             {
-                HashSet<Node<T>> Pc = new HashSet<Node<T>>(P.OrderByDescending(x => x.edges.Count));
+                HashSet<Node<T>> Pc = new(P.OrderByDescending(x => x.edges.Count));
                 foreach (Node<T> n in Pc)
                 {
-                    HashSet<Node<T>> s = new HashSet<Node<T>>() { n };
+                    HashSet<Node<T>> s = new() { n };
                     BronKerbosch1(Union<Node<T>>(R, s), Intersection<Node<T>>(P, n.edges), Intersection<Node<T>>(X, n.edges), ref cliques);
                     P = Difference<Node<T>>(P, s);
                     X = Union<Node<T>>(X, s);
@@ -814,7 +812,7 @@ namespace AdventOfCode
                 HashSet<Node<T>> Pu = Difference<Node<T>>(P, pivot.edges);
                 foreach (Node<T> n in Pu)
                 {
-                    HashSet<Node<T>> s = new HashSet<Node<T>>() { n };
+                    HashSet<Node<T>> s = new() { n };
                     BronKerbosch2(Union<Node<T>>(R, s), Intersection<Node<T>>(P, n.edges), Intersection<Node<T>>(X, n.edges), ref cliques);
                     P = Difference<Node<T>>(P, s);
                     X = Union<Node<T>>(X, s);
@@ -835,6 +833,19 @@ namespace AdventOfCode
                 t = v;
                 parent = p;
                 children = new HashSet<Node<T>>();
+            }
+            public List<Node<T>> ToList()
+            {
+                List<Node<T>> list = new() { this };
+                foreach (var c in this.children)
+                    ToList(c, list);
+                return list;
+            }
+            public static void ToList(Node<T> node, List<Node<T>> list)
+            {
+                list.Add(node);
+                foreach (var c in node.children)
+                    ToList(c, list);
             }
         };
         public class BinNode<T>
@@ -915,7 +926,7 @@ namespace AdventOfCode
         }
         public static String[] RegexRemove(string s, string pattern = "[^0-9- ]", char replace = ' ')
         {
-            Regex rgx = new Regex(pattern);
+            Regex rgx = new(pattern);
             s = rgx.Replace(s, replace.ToString());
             return s.Split(replace, StringSplitOptions.RemoveEmptyEntries).ToArray();
         }

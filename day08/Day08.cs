@@ -7,80 +7,35 @@ namespace aoc
     public class Day08
     {
         // Treetop Tree House: Do metrics in all positions & directions
-        public static bool Visible(Map m, Pos p0, Pos fromDir)
+        public static int ViewLength(Map m, Pos p0, Pos dir, HashSet<Pos> visible)
         {
-            bool visible = true;
-            var p = p0;
-            do
+            bool isVisible = true;
+            int viewLength = -1;
+            for (var p = p0; m.HasPosition(p);)
             {
-                if (p != p0 && m.HasPosition(p))
+                viewLength++;
+                if (m[p] >= m[p0] && p != p0)
                 {
-                    if (m[p] >= m[p0])
-                    {
-                        visible = false;
-                        break;
-                    }
+                    isVisible = false;
+                    break;
                 }
-                p = p + fromDir;
+                p += dir;
             }
-            while (m.HasPosition(p));
-            return visible;
+            if (isVisible)
+                visible.Add(p0);
+            return viewLength;
         }
-        public static int VisiblePartB(Map m, Pos p0, Pos toDir)
+        public static (Object a, Object b) DoPuzzle(string file)
         {
-            int nVisible = 0;
-            var p = p0;
-            do
-            {
-                if (p != p0 && m.HasPosition(p))
-                {
-                    nVisible++;
-                    if (m[p] >= m[p0])
-                        break;
-                }
-                p = p + toDir;
-            }
-            while (m.HasPosition(p));
-            return nVisible;
+            var m = Map.Build(ReadInput.Strings(Day, file));
+            HashSet<Pos> visible = new();
+            int max = m.Positions()
+                .Select(p => CoordsXY.directions4.Select(dir => ViewLength(m, p, dir, visible))
+                .Aggregate((a, x) => a * x))
+                .Max();
+            return (visible.Count, max);
         }
-        public static Object PartA(string file)
-        {
-            var input = ReadInput.Strings(Day, file);
-            var m = Map.Build(input);
-            HashSet<Pos> visible = new HashSet<Pos>();
-            foreach (Pos p in m.Positions())
-            {
-                if (Visible(m, p, CoordsXY.goLeft))
-                    visible.Add(p);
-                if (Visible(m, p, CoordsXY.goUp))
-                    visible.Add(p);
-                if (Visible(m, p, CoordsXY.goRight))
-                    visible.Add(p);
-                if (Visible(m, p, CoordsXY.goDown))
-                    visible.Add(p);
-            }
-            return visible.Count;
-        }
-
-        public static Object PartB(string file)
-        {
-            var input = ReadInput.Strings(Day, file);
-            var m = Map.Build(input);
-            int max = 0;
-            foreach (Pos p in m.Positions())
-            {
-                int a = VisiblePartB(m, p, CoordsXY.goLeft);
-                int b = VisiblePartB(m, p, CoordsXY.goUp);
-                int c = VisiblePartB(m, p, CoordsXY.goRight);
-                int d = VisiblePartB(m, p, CoordsXY.goDown);
-                int val = a * b * c * d;
-                if (val > max)
-                    max = val;
-            }
-            return max;
-        }
-
-        static void Main() => Aoc.Execute(Day, PartA, PartB);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

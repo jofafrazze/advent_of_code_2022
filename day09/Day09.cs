@@ -7,73 +7,32 @@ namespace aoc
     public class Day09
     {
         // Rope Bridge: Move a rope's tail(s) so it follows the head
-        public static Pos MoveTail(Pos head, Pos tail)
+        public static void MoveTail(Pos head, ref Pos tail)
         {
-            bool moveTail = true;
-            foreach (var d in CoordsXY.directions8)
-                if (head + d == tail)
-                    moveTail = false;
-            if (moveTail)
+            if (!CoordsXY.Neighbours8(head).Contains(tail))
+                tail += new Pos(head.x.CompareTo(tail.x), head.y.CompareTo(tail.y));
+        }
+        public static int MoveRope(List<string> steps, int length)
+        {
+            var rope = new Pos[length];
+            var visited = new HashSet<Pos>() { rope.Last() };
+            foreach (var s in steps)
             {
-                int xadd = head.x == tail.x ? 0 : (head.x > tail.x ? 1 : -1);
-                int yadd = head.y == tail.y ? 0 : (head.y > tail.y ? 1 : -1);
-                tail.x += xadd;
-                tail.y += yadd;
+                Pos dir = CoordsXY.directions4["URDL".IndexOf(s[0])];
+                for (int n = 0; n < int.Parse(s[2..]); n++)
+                {
+                    rope[0] += dir;
+                    for (int i = 1; i < length; i++)
+                        MoveTail(rope[i - 1], ref rope[i]);
+                    visited.Add(rope.Last());
+                }
             }
-            return tail;
+            return visited.Count;
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);
-            var visited = new HashSet<Pos>();
-            Pos head = new Pos(), tail = new Pos();
-            visited.Add(tail);
-            foreach (var s in input)
-            {
-                Pos dir = new Pos();
-                if (s[0] == 'L')
-                    dir = CoordsXY.goLeft;
-                else if (s[0] == 'U')
-                    dir = CoordsXY.goUp;
-                else if (s[0] == 'R')
-                    dir = CoordsXY.goRight;
-                else if (s[0] == 'D')
-                    dir = CoordsXY.goDown;
-                int n = int.Parse(s.Substring(2));
-                for (int nn = 0; nn < n; nn++)
-                {
-                    head += dir;
-                    tail = MoveTail(head, tail);
-                    visited.Add(tail);
-                }
-            }
-            // B
-            Pos[] rope = new Pos[10];
-            var bvisited = new HashSet<Pos>();
-            bvisited.Add(rope[9]);
-            for (int i = 0; i < rope.Length; i++)
-                rope[i] = new Pos();
-            foreach (var s in input)
-            {
-                Pos dir = new Pos();
-                if (s[0] == 'L')
-                    dir = CoordsXY.goLeft;
-                else if (s[0] == 'U')
-                    dir = CoordsXY.goUp;
-                else if (s[0] == 'R')
-                    dir = CoordsXY.goRight;
-                else if (s[0] == 'D')
-                    dir = CoordsXY.goDown;
-                int n = int.Parse(s.Substring(2));
-                for (int nn = 0; nn < n; nn++)
-                {
-                    rope[0] += dir;
-                    for (int i = 0; i < rope.Length - 1; i++)
-                        rope[i + 1] = MoveTail(rope[i], rope[i + 1]);
-                    bvisited.Add(rope[9]);
-                }
-            }
-            return (visited.Count, bvisited.Count);
+            return (MoveRope(input, 2), MoveRope(input, 10));
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
