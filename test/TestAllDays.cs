@@ -75,6 +75,24 @@ namespace test
     }
     public class TestDay10
     {
+        readonly string se =
+            "##  ##  ##  ##  ##  ##  ##  ##  ##  ##  " + System.Environment.NewLine +
+            "###   ###   ###   ###   ###   ###   ### " + System.Environment.NewLine +
+            "####    ####    ####    ####    ####    " + System.Environment.NewLine +
+            "#####     #####     #####     #####     " + System.Environment.NewLine +
+            "######      ######      ######      ####" + System.Environment.NewLine +
+            "#######       #######       #######     " + System.Environment.NewLine;
+        [Fact]
+        public void Example() => Assert.Equal((13140, se), aoc.Day10.DoPuzzle(Input.example));
+        readonly string sa =
+            "###   ##  ###  #  # ###  ####  ##  ###  " + System.Environment.NewLine +
+            "#  # #  # #  # #  # #  # #    #  # #  # " + System.Environment.NewLine +
+            "#  # #    #  # #### ###  ###  #  # ###  " + System.Environment.NewLine +
+            "###  # ## ###  #  # #  # #    #### #  # " + System.Environment.NewLine +
+            "#    #  # #    #  # #  # #    #  # #  # " + System.Environment.NewLine +
+            "#     ### #    #  # ###  #### #  # ###  " + System.Environment.NewLine;
+        [Fact]
+        public void Test() => Assert.Equal((13520, sa), aoc.Day10.DoPuzzle(Input.actual));
     }
     public class TestDay11
     {
