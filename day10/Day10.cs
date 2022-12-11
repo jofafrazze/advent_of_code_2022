@@ -54,7 +54,7 @@ namespace aoc
             }
             return (nums.Sum(), m.PrintToString());
         }
-        static void Main() => Aoc.Execute(Day, DoPuzzle, true);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }
