@@ -6,51 +6,31 @@ namespace aoc
 {
     public class Day10
     {
-        // Today: 
-        public static void Add(List<int> nums, int position, int cycle, int c, int x)
+        // Cathode-Ray Tube: Run assembly program, create ascii art
+        public static void AddSignalStrength(List<int> nums, int pos, int signalCycle, int cycle, int x)
         {
-            if (nums.Count <= position && c >= cycle)
-                nums.Add(x * cycle);
+            if (nums.Count <= pos && cycle >= signalCycle)
+                nums.Add(x * signalCycle);
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
-            var input = ReadInput.Strings(Day, file);
             List<int> nums = new();
-            int nextx = 1, x;
-            int c = 0, cmap = 0;
+            int x, nextx = 1, cycle = 0, c = 0;
             var m = new Map(40, 6, ' ');
-            foreach (var s in input)
+            foreach (var s in ReadInput.Strings(Day, file))
             {
                 x = nextx;
-                if (s == "noop")
+                cycle += s == "noop" ? 1 : 2;
+                nextx += s == "noop" ? 0 : int.Parse(s[5..]);
+                for (int i = 0; i < 6; i++)
+                    AddSignalStrength(nums, i, i * 40 + 20, cycle, x);
+                while (c < cycle)
                 {
-                    c += 1;
+                    int row = c / 40;
+                    int col = c % 40;
+                    m[new Pos(col, row)] = Math.Abs(x - col) > 1 ? ' ' : '#';
+                    c++;
                 }
-                else 
-                {
-                    c += 2;
-                    nextx += int.Parse(s[5..]);
-                }
-                if (nums.Count < 6)
-                {
-                    Add(nums, 0, 20, c, x);
-                    Add(nums, 1, 60, c, x);
-                    Add(nums, 2, 100, c, x);
-                    Add(nums, 3, 140, c, x);
-                    Add(nums, 4, 180, c, x);
-                    Add(nums, 5, 220, c, x);
-                }
-                while (cmap < c)
-                {
-                    int row = cmap / 40;
-                    int col = cmap % 40;
-                    int diff = x - col;
-                    char fill = (diff > 1 || diff < -1) ? ' ' : '#';
-                    m[new Pos(col, row)] = fill;
-                    cmap++;
-                }
-                if (c >= 240)
-                    break;
             }
             return (nums.Sum(), m.PrintToString());
         }
