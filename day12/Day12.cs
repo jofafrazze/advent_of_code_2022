@@ -7,87 +7,36 @@ namespace aoc
     public class Day12
     {
         // Hill Climbing Algorithm: Traverse map, first up then down
-        public static int DoPuzzleA(string file)
+        public static Dictionary<Pos, int> WalkMap(Map m, Pos start, bool walkUp)
         {
-            var m = Map.Build(ReadInput.Strings(Day, file));
-            Pos sPos = new Pos(), ePos = new Pos();
-            foreach (Pos p in m.Positions())
-            {
-                if (m[p] == 'S')
-                    sPos = p;
-                if (m[p] == 'E')
-                    ePos = p;
-            }
-            var steps = new Dictionary<Pos, int>();
-            steps[sPos] = 0;
-            var next = new Queue<Pos>();
-            next.Enqueue(sPos);
+            bool CanMove(int to, int from) => (to - from) * (walkUp ? 1 : -1) <= 1;
+            var steps = new Dictionary<Pos, int> { [start] = 0 };
+            var next = new Queue<Pos>(new[] { start });
             while (next.Any())
             {
                 Pos p = next.Dequeue();
-                //Console.WriteLine("Best so far: {0}, {1} = {2}", p.x, p.y, steps[p]);
                 foreach (var n in CoordsRC.Neighbours4(p))
-                {
-                    if (m.HasPosition(n))
-                    {
-                        int nextVal = m[n] == 'E' ? 'z' : m[n];
-                        int d = nextVal - m[p];
-                        if (m[p] == 'S' || (m[n] != 'S' && d <= 1))
+                    if (m.HasPosition(n) && CanMove(m[n], m[p]))
+                        if (!steps.ContainsKey(n) || steps[n] > steps[p] + 1)
                         {
-                            if (!steps.ContainsKey(n) || steps[n] > steps[p] + 1)
-                            {
-                                steps[n] = steps[p] + 1;
-                                if (m[n] != 'E')
-                                    next.Enqueue(n);
-                            }
+                            steps[n] = steps[p] + 1;
+                            next.Enqueue(n);
                         }
-                    }
-                }
             }
-            return steps[ePos];
+            return steps;
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
             var m = Map.Build(ReadInput.Strings(Day, file));
-            Pos sPos = new Pos(), ePos = new Pos();
-            foreach (Pos p in m.Positions())
-            {
-                if (m[p] == 'S')
-                    sPos = p;
-                if (m[p] == 'E')
-                    ePos = p;
-            }
+            Pos sPos = m.Positions().Where(p => m[p] == 'S').First();
+            Pos ePos = m.Positions().Where(p => m[p] == 'E').First();
             m[sPos] = 'a';
             m[ePos] = 'z';
-            var steps = new Dictionary<Pos, int>();
-            steps[ePos] = 0;
-            var next = new Queue<Pos>();
-            next.Enqueue(ePos);
-            while (next.Any())
-            {
-                Pos p = next.Dequeue();
-                //Console.WriteLine("Best so far: {0}, {1} = {2}", p.y, p.x, steps[p]);
-                foreach (var n in CoordsRC.Neighbours4(p))
-                {
-                    if (m.HasPosition(n))
-                    {
-                        int d = m[n] - m[p];
-                        if (d >= -1)
-                        {
-                            if (!steps.ContainsKey(n) || steps[n] > steps[p] + 1)
-                            {
-                                steps[n] = steps[p] + 1;
-                                next.Enqueue(n);
-                            }
-                        }
-                    }
-                }
-            }
-            int a = DoPuzzleA(file);
-            int b = steps.Where(z => m[z.Key] == 'a').Select(z => z.Value).Min();
+            int a = WalkMap(m, sPos, true)[ePos];
+            int b = WalkMap(m, ePos, false).Where(z => m[z.Key] == 'a').Select(z => z.Value).Min();
             return (a, b);
         }
-        static void Main() => Aoc.Execute(Day, DoPuzzle, true);
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
     }
 }

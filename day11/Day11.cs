@@ -17,9 +17,7 @@ namespace aoc
         {
             long bmod = monkeys.Select(m => m.mod).Aggregate(1, (a, b) => a * b);
             for (int i = 0; i < (partA ? 20 : 10000); i++)
-            {
                 foreach (var m in monkeys)
-                {
                     while (m.items.Count > 0)
                     {
                         long w = m.items.Dequeue();
@@ -29,8 +27,6 @@ namespace aoc
                         monkeys[w % m.mod == 0 ? m.trueNext : m.falseNext].items.Enqueue(w);
                         m.nInspected++;
                     }
-                }
-            }
             var n = monkeys.Select(m => (long)m.nInspected).OrderByDescending(x => x).ToList();
             return n[0] * n[1];
         }
