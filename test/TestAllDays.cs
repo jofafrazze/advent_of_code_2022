@@ -110,6 +110,10 @@ namespace test
     }
     public class TestDay13
     {
+        [Fact]
+        public void Example() => Assert.Equal((13, 140), aoc.Day13.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((6415, 20056), aoc.Day13.DoPuzzle(Input.actual));
     }
     public class TestDay14
     {
