@@ -273,6 +273,18 @@ namespace AdventOfCode
                     data[x, y] = m.data[x, y];
         }
 
+        public static Map Build(Dictionary<GenericPosition2D<int>, char> dict, char fill = ' ')
+        {
+            int xMin = dict.Select(z => z.Key.x).Min();
+            var yMin = dict.Select(z => z.Key.y).Min();
+            int w = dict.Select(z => z.Key.x).Max() - xMin + 1;
+            int h = dict.Select(z => z.Key.y).Max() - yMin + 1;
+            Map m = new(w, h, fill);
+            foreach (var z in dict)
+                m.data[z.Key.x - xMin, z.Key.y - yMin] = z.Value;
+            return m;
+        }
+
         public static Map Build(IList<string> list)
         {
             int w = list[0].Length;

@@ -64,10 +64,12 @@ namespace aoc
         public static (Object a, Object b) DoPuzzle(string file)
         {
             var map = ReadMap(file);
+            //Map.Build(map).Print();
             int maxRow = map.Select(z => z.Key.y).Max();
             int a = 0;
             while (AddSand(map, maxRow))
                 a++;
+            //Map.Build(map).Print();
             map = ReadMap(file);
             int floor = maxRow + 2;
             for (int i = -1000; i < 2000; i++)
