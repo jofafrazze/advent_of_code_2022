@@ -6,25 +6,19 @@ namespace aoc
 {
     public class Day18
     {
-        // Today: 
-        static List<Pos> dir6 = new()
+        // Boiling Boulders: Calculate total 3D surface, with and without cavities
+        static readonly List<Pos> dir6 = new() 
         {
-            new Pos(-1, 0, 0), new Pos(1, 0, 0), new Pos(0, -1, 0),
-            new Pos(0, 1, 0), new Pos(0, 0, -1), new Pos(0, 0, 1)
+            new(-1, 0, 0), new(1, 0, 0), new(0, -1, 0), new(0, 1, 0), new(0, 0, -1), new(0, 0, 1)
         };
         static int Surface(List<Pos> cubes)
         {
             int n = 0;
             foreach (var c in cubes)
-            {
-                var n6 = dir6.Select(w => w + c);
-                var others = cubes.Where(w => w != c);
-                int covered = others.Intersect(n6).Count();
-                n += 6 - covered;
-            }
+                n += 6 - cubes.Where(w => w != c).Intersect(dir6.Select(w => w + c)).Count();
             return n;
         }
-        static HashSet<Pos> FindEncapsulation(Pos p0, List<Pos> cubes)
+        static List<Pos> FindEncapsulations(List<Pos> cubes)
         {
             int xMin = cubes.Select(w => w.x).Min();
             int xMax = cubes.Select(w => w.x).Max();
@@ -32,27 +26,42 @@ namespace aoc
             int yMax = cubes.Select(w => w.y).Max();
             int zMin = cubes.Select(w => w.z).Min();
             int zMax = cubes.Select(w => w.z).Max();
-            HashSet<Pos> within = new() { p0 };
-            List<Pos> toTry = new() { p0 };
+            HashSet<Pos> searchSpace = new();
+            for (int x = xMin; x <= xMax; x++)
+                for (int y = yMin; y <= yMax; y++)
+                    for (int z = zMin; z <= zMax; z++)
+                        searchSpace.Add(new(x, y, z));
+            HashSet<Pos> inside = new();
+            var toTry = searchSpace.Except(cubes).ToHashSet();
             while (toTry.Any())
             {
-                Pos p = toTry.First();
-                toTry.RemoveAt(0);
-                if (p.x <= xMin || p.x >= xMax || p.y <= yMin || p.y >= yMax || p.z <= zMin || p.z >= zMax)
-                    return new HashSet<Pos>();
-                else
+                var cluster = Reachable(toTry.First(), cubes, toTry);
+                bool within = 
+                    cluster.Select(w => w.x).Min() > xMin && cluster.Select(w => w.x).Max() < xMax &&
+                    cluster.Select(w => w.y).Min() > yMin && cluster.Select(w => w.y).Max() < yMax &&
+                    cluster.Select(w => w.z).Min() > zMin && cluster.Select(w => w.z).Max() < zMax;
+                if (within)
+                    inside.UnionWith(cluster);
+                toTry = toTry.Except(cluster).ToHashSet();
+            }
+            return inside.ToList();
+        }
+        static HashSet<Pos> Reachable(Pos p0, List<Pos> cubes, HashSet<Pos> searchSpace)
+        {
+            HashSet<Pos> canReach = new();
+            Queue<Pos> toTry = new(new[] { p0 });
+            while (toTry.Any())
+            {
+                Pos p = toTry.Dequeue();
+                if (!canReach.Contains(p) && searchSpace.Contains(p))
                 {
+                    canReach.Add(p);
                     var n6 = dir6.Select(w => w + p);
-                    var canReach = n6.Except(cubes.Intersect(n6));
-                    foreach (var c in canReach)
-                        if (!within.Contains(c))
-                        {
-                            within.Add(c);
-                            toTry.Add(c);
-                        }
+                    foreach (var n in n6.Except(cubes.Intersect(n6)))
+                        toTry.Enqueue(n);
                 }
             }
-            return within;
+            return canReach;
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
@@ -63,30 +72,7 @@ namespace aoc
                 cubes.Add(new Pos(v[0], v[1], v[2]));
             }
             int a = Surface(cubes);
-            HashSet<Pos> within = new();
-            int xMin = cubes.Select(w => w.x).Min();
-            int xMax = cubes.Select(w => w.x).Max();
-            int yMin = cubes.Select(w => w.y).Min();
-            int yMax = cubes.Select(w => w.y).Max();
-            int zMin = cubes.Select(w => w.z).Min();
-            int zMax = cubes.Select(w => w.z).Max();
-            for (int x = xMin; x <= xMax; x++)
-            {
-                Console.WriteLine("x = {0}({1})", x, xMax);
-                for (int y = yMin; y <= yMax; y++)
-                {
-                    for (int z = zMin; z <= zMax; z++)
-                    {
-                        Pos p = new(x, y, z);
-                        if (!cubes.Contains(p))
-                        {
-                            HashSet<Pos> w = FindEncapsulation(p, cubes);
-                            within.UnionWith(w);
-                        }
-                    }
-                }
-            }
-            return (a, a - Surface(within.ToList()));
+            return (a, a - Surface(FindEncapsulations(cubes)));
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle);
         static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
