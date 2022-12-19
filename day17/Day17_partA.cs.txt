@@ -1,0 +1,81 @@
+﻿using AdventOfCode;
+using System.Reflection;
+using Pos = AdventOfCode.GenericPosition2D<int>;
+
+namespace aoc
+{
+    public class Day17
+    {
+        // Today: 
+        static List<Pos> MoveRock(List<Pos> r, int x, int y)
+        {
+            List<Pos> l = new();
+            foreach (Pos p in r)
+                l.Add(new Pos(p.x + x, p.y + y));
+            return l;
+        }
+        static bool ValidSidePosition(List<Pos> r, HashSet<Pos> positions)
+        {
+            bool valid = true;
+            foreach (var p in r)
+            {
+                if (p.x < 0 || p.x > 6)
+                    valid = false;
+            }
+            return valid && ValidDownPosition(r, positions);
+        }
+        static bool ValidDownPosition(List<Pos> r, HashSet<Pos> positions)
+        {
+            bool valid = true;
+            foreach (var p in r)
+            {
+                if (positions.Contains(p))
+                    valid = false;
+            }
+            return valid;
+        }
+        public static (Object a, Object b) DoPuzzle(string file)
+        {
+            string jets = ReadInput.Strings(Day, file)[0];
+            List<Pos> sym0 = new List<Pos> { new(0, 0), new(1, 0), new(2, 0), new(3, 0) }; // -
+            List<Pos> sym1 = new List<Pos> { new(1, 0), new(0, 1), new(1, 1), new(2, 1), new(1, 2) }; // +
+            List<Pos> sym2 = new List<Pos> { new(0, 0), new(1, 0), new(2, 0), new(2, 1), new(2, 2) }; // L
+            List<Pos> sym3 = new List<Pos> { new(0, 0), new(0, 1), new(0, 2), new(0, 3) }; // |
+            List<Pos> sym4 = new List<Pos> { new(0, 0), new(0, 1), new(1, 0), new(1, 1) }; // #
+            List<List<Pos>> rocks = new() { sym0, sym1, sym2, sym3, sym4 };
+            List<Pos> bottom = new List<Pos> { new(0, -1), new(1, -1), new(2, -1), new(3, -1), new(4, -1), new(5, -1), new(6, -1) }; // -------
+            HashSet<Pos> positions = new(bottom);
+            int startHeight;
+            int jetIdx = 0;
+            for (int i = 0; i < 2022; i++)
+            {
+                startHeight = positions.Select(p => p.y).Max() + 4;
+                List<Pos> r = rocks[i % 5].ToList();
+                r = MoveRock(r, 2, startHeight);
+                bool falling = true;
+                while (falling)
+                {
+                    bool left = jets[jetIdx++ % jets.Length] == '<';
+                    var rSide = MoveRock(r, left ? -1 : 1, 0);
+                    if (ValidSidePosition(rSide, positions))
+                        r = rSide;
+                    var rDown = MoveRock(r, 0, -1);
+                    if (ValidDownPosition(rDown, positions))
+                        r = rDown;
+                    else
+                    {
+                        falling = false;
+                        foreach (Pos p in r)
+                            positions.Add(p);
+                    }
+                }
+                //var dp = positions.ToDictionary(p => new Pos(p.x, -p.y), p => '#');
+                //Map.Build(dp).Print();
+            }
+            int a = positions.Select(p => p.y).Max() + 1;
+            return (a, 0);
+        }
+        static void Main() => Aoc.Execute(Day, DoPuzzle);
+        static string Day => Aoc.Day(MethodBase.GetCurrentMethod()!);
+    }
+}
