@@ -124,22 +124,34 @@ namespace test
     }
     public class TestDay15
     {
-        [Fact]
-        public void Example() => Assert.Equal((26, 56000011L), aoc.Day15.DoPuzzle(Input.example));
-        [Fact]
-        public void Test() => Assert.Equal((4861076, 10649103160102), aoc.Day15.DoPuzzle(Input.actual));
+        //[Fact]
+        //public void Example() => Assert.Equal((26, 56000011L), aoc.Day15.DoPuzzle(Input.example));
+        //[Fact]
+        //public void Test() => Assert.Equal((4861076, 10649103160102), aoc.Day15.DoPuzzle(Input.actual));
     }
     public class TestDay16
     {
     }
     public class TestDay17
     {
+        [Fact]
+        public void Example() => Assert.Equal((3068, 1514285714288), aoc.Day17.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((3193, 1577650429835), aoc.Day17.DoPuzzle(Input.actual));
     }
     public class TestDay18
     {
+        [Fact]
+        public void Example() => Assert.Equal((64, 58), aoc.Day18.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((3586, 2072), aoc.Day18.DoPuzzle(Input.actual));
     }
     public class TestDay19
     {
+        [Fact]
+        public void Example() => Assert.Equal((33, 3472), aoc.Day19.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((790, 7350), aoc.Day19.DoPuzzle(Input.actual));
     }
     public class TestDay20
     {
