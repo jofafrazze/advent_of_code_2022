@@ -1,0 +1,15 @@
+root: A + K
+M: 5
+B: D + E
+N: 2
+G: humn - H
+H: 3
+C: 4
+humn: 5
+F: 2
+K: L * M
+D: 4
+A: B / C
+E: F * G
+L: P - N
+P: 32
