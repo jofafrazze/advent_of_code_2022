@@ -116,7 +116,7 @@ namespace aoc
             bool gHasX = dict[dict["root"].g].bx;
             string kX = gHasX ? dict["root"].g : dict["root"].h;
             string kNum = gHasX ? dict["root"].h : dict["root"].g;
-            double b = GoDown(kX, dict, Calc(kNum, dict));
+            long b = GoDown(kX, dict, Calc(kNum, dict));
             return (a, b);
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle);
