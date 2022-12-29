@@ -124,13 +124,17 @@ namespace test
     }
     public class TestDay15
     {
-        //[Fact]
-        //public void Example() => Assert.Equal((26, 56000011L), aoc.Day15.DoPuzzle(Input.example));
-        //[Fact]
-        //public void Test() => Assert.Equal((4861076, 10649103160102), aoc.Day15.DoPuzzle(Input.actual));
+        [Fact]
+        public void Example() => Assert.Equal((26, 56000011L), aoc.Day15.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((4861076, 10649103160102), aoc.Day15.DoPuzzle(Input.actual));
     }
     public class TestDay16
     {
+        [Fact]
+        public void Example() => Assert.Equal((1651, 1707), aoc.Day16.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((1754, 2474), aoc.Day16.DoPuzzle(Input.actual));
     }
     public class TestDay17
     {
@@ -176,11 +180,23 @@ namespace test
     }
     public class TestDay23
     {
+        [Fact]
+        public void Example() => Assert.Equal((110, 20), aoc.Day23.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((3947, 1012), aoc.Day23.DoPuzzle(Input.actual));
     }
     public class TestDay24
     {
+        [Fact]
+        public void Example() => Assert.Equal((18, 54), aoc.Day24.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal((230, 713), aoc.Day24.DoPuzzle(Input.actual));
     }
     public class TestDay25
     {
+        [Fact]
+        public void Example() => Assert.Equal(("2=-1=0", 0), aoc.Day25.DoPuzzle(Input.example));
+        [Fact]
+        public void Test() => Assert.Equal(("20=022=21--=2--12=-2", 0), aoc.Day25.DoPuzzle(Input.actual));
     }
 }

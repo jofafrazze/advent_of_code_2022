@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -240,6 +244,102 @@ namespace AdventOfCode
                 Extensions.Abs(Extensions.Subtract(y, p.y!)),
                 Extensions.Abs(Extensions.Subtract(z, p.z!))
                 );
+        }
+    }
+
+    public struct IntRange : IComparable<IntRange> 
+    {
+        public int start;
+        public int end;
+
+        public IntRange(IntRange r)
+        {
+            start = r.start;
+            end = r.end;
+        }
+        public IntRange(int start, int end)
+        {
+            this.start = start;
+            this.end = end;
+        }
+        public int CompareTo(IntRange r)
+        {
+            if (!EqualityComparer<int>.Default.Equals(start, r.start))
+                return Comparer<int>.Default.Compare(start, r.start);
+            else
+                return Comparer<int>.Default.Compare(end, r.end);
+        }
+        public override bool Equals(Object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            return obj is IntRange d && Equals(d);
+        }
+        public bool Equals(IntRange r)
+        {
+            return EqualityComparer<int>.Default.Equals(start, r.start) && 
+                EqualityComparer<int>.Default.Equals(end, r.end);
+        }
+        public override int GetHashCode() => HashCode.Combine(start, end);
+
+        public static bool operator ==(IntRange p1, IntRange p2) { return p1.Equals(p2); }
+        public static bool operator !=(IntRange p1, IntRange p2) { return !p1.Equals(p2); }
+        public static bool operator <(IntRange p1, IntRange p2) { return p1.CompareTo(p2) < 0; }
+        public static bool operator <=(IntRange p1, IntRange p2) { return p1.CompareTo(p2) <= 0; }
+        public static bool operator >(IntRange p1, IntRange p2) { return p1.CompareTo(p2) > 0; }
+        public static bool operator >=(IntRange p1, IntRange p2) { return p1.CompareTo(p2) >= 0; }
+        public int Size() => end - start + 1;
+        public List<IntRange> Union(IntRange r)
+        {
+            List<IntRange> l = new() { this, r };
+            l.Sort();
+            if (l[0].end >= l[1].start)
+                return new List<IntRange>() { new(l[0].start, Math.Max(l[0].end, l[1].end)) };
+            else
+                return l;
+        }
+        public List<IntRange> Intersect(IntRange r)
+        {
+            List<IntRange> l = new() { this, r };
+            l.Sort();
+            if (l[0].end >= l[1].start)
+                return new List<IntRange>() { new(l[1].start, Math.Min(l[0].end, l[1].end)) };
+            else
+                return new List<IntRange>();
+        }
+        public List<IntRange> Except(int i)
+        {
+            if (start == i && Size() == 1)
+                return new List<IntRange>() { };
+            else if (start > i || end < i)
+                return new List<IntRange>() { this };
+            else if (start == i)
+                return new List<IntRange> { new(start + 1, end) };
+            else if (end == i)
+                return new List<IntRange> { new(start, end - 1) };
+            else
+                return new List<IntRange> { new(start, i - 1), new(i + 1, end) };
+        }
+        public static List<IntRange> NormalizeUnion(List<IntRange> list)
+        {
+            if (list.Count == 0)
+                return new();
+            var after = list.ToList();
+            after.Sort();
+            List<IntRange> before;
+            do
+            {
+                before = after;
+                after = new List<IntRange>() { before.First() };
+                for (int i = 1; i < before.Count; i++)
+                {
+                    IntRange r = after.Last();
+                    after.RemoveAt(after.Count - 1);
+                    after.AddRange(r.Union(before[i]));
+                }
+            }
+            while (!after.SequenceEqual(before));
+            return after;
         }
     }
 
@@ -744,16 +844,37 @@ namespace AdventOfCode
             IsValid() && range.IsValid() && this.Contains(range.Lo) && this.Contains(range.Hi);
     }
 
-    public static class CircularLinkedList
+    public static class ExtendCollections
     {
         public static LinkedListNode<T> NextOrFirst<T>(this LinkedListNode<T> current)
         {
             return current.Next! ?? current.List!.First!;
         }
-
         public static LinkedListNode<T> PreviousOrLast<T>(this LinkedListNode<T> current)
         {
             return current.Previous! ?? current.List!.Last!;
+        }
+        public static LinkedListNode<T> NextOrFirst<T>(this LinkedListNode<T> current, int n)
+        {
+            for (int i = 0; i < n; i++)
+                current = current.Next! ?? current.List!.First!;
+            return current;
+        }
+        public static LinkedListNode<T> PreviousOrLast<T>(this LinkedListNode<T> current, int n)
+        {
+            for (int i = 0; i < n; i++)
+                current = current.Previous! ?? current.List!.Last!;
+            return current;
+        }
+        public static V? Read<K, V>(this Dictionary<K, V> dict, K key) where K : notnull
+        {
+            if (dict.ContainsKey(key)) return dict[key];
+            return default;
+        }
+        public static V Read<K, V>(this Dictionary<K, V> dict, K key, V def) where K : notnull
+        {
+            if (dict.ContainsKey(key)) return dict[key];
+            return def;
         }
     }
 
