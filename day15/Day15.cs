@@ -37,7 +37,7 @@ namespace aoc
             int a = ranges.Select(w => w.Size()).Sum();
             //Console.WriteLine($"A: {n}");
             // B
-            List<Pos> toCheck = new();
+            List<Pos> toCheck = new(100_000_000);
             foreach (var (p, _, rs) in sensors)
             {
                 int r = rs + 1;
