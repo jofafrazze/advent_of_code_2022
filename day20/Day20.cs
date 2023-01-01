@@ -1,6 +1,6 @@
 ﻿using AdventOfCode;
 using System.Reflection;
-using CLL = AdventOfCode.CircularLinkedList;
+using CLL = AdventOfCode.ExtendCollections;
 
 namespace aoc
 {

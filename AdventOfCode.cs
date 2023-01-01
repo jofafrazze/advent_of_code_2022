@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -55,6 +56,7 @@ namespace AdventOfCode
         {
             return p1 + new GenericPosition2D<T>(k, k);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static GenericPosition2D<T> operator +(GenericPosition2D<T> p1, GenericPosition2D<T> p2)
         {
             GenericPosition2D<T> p = new(p1);
@@ -726,6 +728,7 @@ namespace AdventOfCode
 
     public static class Extensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Add<T>(T number1, T number2) where T : notnull
         {
             dynamic a = number1;

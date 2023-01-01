@@ -5,7 +5,7 @@ namespace aoc
 {
     public class Day19
     {
-        // Today: 
+        // Not Enough Minerals: Try too many states
         struct State : IEquatable<State>
         {
             public int t;
@@ -115,7 +115,7 @@ namespace aoc
                         ss.cb += next.rb;
                         ss.cc += next.rc;
                         ss.cd += next.rd;
-                        if (!visited.Contains(ss) && ss.cd >= maxGeodes - 3 && ss.rc >= maxGeodeRobots - 3)
+                        if (ss.cd >= maxGeodes - 2 && ss.rc >= maxGeodeRobots - 3 && !visited.Contains(ss))
                         {
                             visited.Add(ss);
                             toTry.Enqueue(ss);
