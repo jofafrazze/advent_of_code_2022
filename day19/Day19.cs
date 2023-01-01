@@ -8,18 +8,18 @@ namespace aoc
         // Not Enough Minerals: Try too many states
         struct State : IEquatable<State>
         {
-            public int t;
-            public int ca;
-            public int cb;
-            public int cc;
-            public int cd;
-            public int ra;
-            public int rb;
-            public int rc;
-            public int rd;
-            public State(int t_, 
-                int a_, int b_, int c_, int d_,
-                int ra_, int rb_, int rc_, int rd_
+            public byte t;
+            public byte ca;
+            public byte cb;
+            public byte cc;
+            public byte cd;
+            public byte ra;
+            public byte rb;
+            public byte rc;
+            public byte rd;
+            public State(byte t_,
+                byte a_, byte b_, byte c_, byte d_,
+                byte ra_, byte rb_, byte rc_, byte rd_
                 )
             { t = t_; 
                 ca = a_; cb = b_; cc = c_; cd = d_;
@@ -29,8 +29,7 @@ namespace aoc
             public bool Equals(State s) => t == s.t &&
                 ca == s.ca && cb == s.cb && cc == s.cc && cd == s.cd &&
                 ra == s.ra && rb == s.rb && rc == s.rc && rd == s.rd;
-            public override int GetHashCode() => HashCode.Combine(
-                HashCode.Combine(t, ca, cb, cc, cd), HashCode.Combine(ra, rb, rc, rd));
+            public override int GetHashCode() => HashCode.Combine(t, ca << 24 | cb << 16 | cc << 8 | cd, ra << 24 | rb << 16 | rc << 8 | rd);
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
@@ -55,7 +54,8 @@ namespace aoc
                 int minutes = bpIdx < nPart2Blueprints ? minutesB : minutesA;
                 State s0 = new(0, 0, 0, 0, 0, 1, 0, 0, 0);
                 HashSet<State> visited = new() { s0 };
-                Queue<State> toTry = new Queue<State>(new[] { s0 });
+                Queue<State> toTry = new(new[] { s0 });
+                //State maxState = new();
                 //var toTry = new PriorityQueue<State, int>(new (State, int)[] { (s0, 0) });
                 var bp = blueprints[bpIdx];
                 int maxGeodesA = 0;
@@ -65,6 +65,15 @@ namespace aoc
                 while (toTry.Any())
                 {
                     State sD = toTry.Dequeue();
+                    //maxState.t = Math.Max(sD.t, maxState.t);
+                    //maxState.ca = Math.Max(sD.ca, maxState.ca);
+                    //maxState.cb = Math.Max(sD.cb, maxState.cb);
+                    //maxState.cc = Math.Max(sD.cc, maxState.cc);
+                    //maxState.cd = Math.Max(sD.cd, maxState.cd);
+                    //maxState.ra = Math.Max(sD.ra, maxState.ra);
+                    //maxState.rb = Math.Max(sD.rb, maxState.rb);
+                    //maxState.rc = Math.Max(sD.rc, maxState.rc);
+                    //maxState.rd = Math.Max(sD.rd, maxState.rd);
                     //if (sD.t > minutePrinted)
                     //{
                     //    Console.WriteLine("{0} states to try (this has t = {1}: {2} ore, {3} clay, {4} obsidian, {5} geodes [{6} ra, {7} rb, {8} rc, {9} rd])",
@@ -73,36 +82,36 @@ namespace aoc
                     //}
                     List<State> nextStates = new();
                     State next = sD;
-                    next.t = sD.t + 1;
+                    next.t = (byte)(sD.t + 1);
                     if (next.t <= minutes)
                     {
                         if (next.ca >= bp.rd_ca && next.cc >= bp.rd_cc)
                         {
                             State s = next;
-                            s.ca -= bp.rd_ca;
-                            s.cc -= bp.rd_cc;
+                            s.ca = (byte)(s.ca - bp.rd_ca);
+                            s.cc = (byte)(s.cc - bp.rd_cc);
                             s.rd += 1;
                             nextStates.Add(s);
                         }
                         if (next.ca >= bp.rc_ca && next.cb >= bp.rc_cb && next.rc < bp.needc)
                         {
                             State s = next;
-                            s.ca -= bp.rc_ca;
-                            s.cb -= bp.rc_cb;
+                            s.ca = (byte)(s.ca - bp.rc_ca);
+                            s.cb = (byte)(s.cb - bp.rc_cb);
                             s.rc += 1;
                             nextStates.Add(s);
                         }
                         if (next.ca >= bp.rb_ca && next.ra < bp.needb)
                         {
                             State s = next;
-                            s.ca -= bp.rb_ca;
+                            s.ca = (byte)(s.ca - bp.rb_ca);
                             s.rb += 1;
                             nextStates.Add(s);
                         }
                         if (next.ca >= bp.ra_ca && next.ra < bp.needa)
                         {
                             State s = next;
-                            s.ca -= bp.ra_ca;
+                            s.ca = (byte)(s.ca - bp.ra_ca);
                             s.ra += 1;
                             nextStates.Add(s);
                         }
@@ -136,6 +145,8 @@ namespace aoc
                     Console.WriteLine("(b factor = {0})", maxGeodes);
                     b *= maxGeodes;
                 }
+                //Console.WriteLine("Max state: {0}: {1}, {2}, {3}, {4} - {5}, {6}, {7}, {8}", maxState.t,
+                //    maxState.ca, maxState.cb, maxState.cc, maxState.cd, maxState.ra, maxState.rb, maxState.rc, maxState.rd);
             }
             return (a, b);
         }
