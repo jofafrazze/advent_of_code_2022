@@ -51,7 +51,7 @@ namespace aoc
                 }
                 if (found)
                 {
-                    Console.WriteLine("Index {0} and down {1} elems matches index: {2} (delta: {3})", idx, len, idx0, idx0 - idx);
+                    //Console.WriteLine("Index {0} and down {1} elems matches index: {2} (delta: {3})", idx, len, idx0, idx0 - idx);
                     return idx0 - idx;
                 }
             }

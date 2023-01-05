@@ -87,10 +87,10 @@ namespace aoc
                     a = w * h - map.Count;
                 }
             }
-            Console.WriteLine("Map contains {0} positions", map.Count);
+            //Console.WriteLine("Map contains {0} positions", map.Count);
             int mw = map.Select(p => p.x).Max() - map.Select(p => p.x).Min() + 1;
             int mh = map.Select(p => p.y).Max() - map.Select(p => p.y).Min() + 1;
-            Console.WriteLine("Map surface has {0} positions in total", mw * mh);
+            //Console.WriteLine("Map surface has {0} positions in total", mw * mh);
             return (a, b);
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle);

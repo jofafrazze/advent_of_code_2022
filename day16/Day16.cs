@@ -7,7 +7,7 @@ namespace aoc
 {
     public class Day16
     {
-        // Proboscidea Volcanium: 
+        // Proboscidea Volcanium: Release pressure, find best combinations
         struct NameTunnel { public string valve; public int cost; public NameTunnel(string v, int c) { valve = v; cost = c; } }
         struct IdTunnel { public int valve; public int cost; public IdTunnel(int v, int c) { valve = v; cost = c; } }
         static List<string> valveNamesList = new();
@@ -24,31 +24,24 @@ namespace aoc
         }
         static List<NameTunnel> GetEffectiveTunnels(string valveName, Dictionary<string, (int rate, List<NameTunnel> tunnels)> dict)
         {
-            var tunnels = dict[valveName].tunnels.ToList();
-            List<NameTunnel> done = tunnels.Where(z => dict[z.valve].rate > 0 || z.valve == "AA").ToList();
-            List<NameTunnel> todo = tunnels.Except(done).ToList();
-            HashSet<string> visited = new() { valveName };
-            while (todo.Any())
+            var done = dict[valveName].tunnels.Where(z => dict[z.valve].rate > 0 || z.valve == "AA").ToList();
+            var todo = new Queue<NameTunnel>(dict[valveName].tunnels.Except(done));
+            var visited = new HashSet<string>() { valveName };
+            while (todo.TryDequeue(out NameTunnel t))
             {
-                NameTunnel t = todo[0];
-                visited.Add(t.valve);
-                todo.RemoveAt(0);
-                List<NameTunnel> step = dict[t.valve].tunnels.Select(z => new NameTunnel(z.valve, t.cost + 1)).ToList();
-                foreach (NameTunnel t2 in step)
+                if (!visited.Add(t.valve))
+                    continue;
+                foreach (var t2 in dict[t.valve].tunnels.Select(z => new NameTunnel(z.valve, t.cost + 1)))
                     if (dict[t2.valve].rate == 0 && t2.valve != "AA")
-                    {
-                        if (!visited.Contains(t2.valve))
-                            todo.Add(new NameTunnel(t2.valve, t2.cost));
-                    }
-                    else
-                        if (!done.Where(z => z.valve == t2.valve).Any() && t2.valve != valveName)
-                            done.Add(t2);
+                        todo.Enqueue(new(t2.valve, t2.cost));
+                    else if (!done.Where(z => z.valve == t2.valve).Any() && t2.valve != valveName)
+                        done.Add(t2);
             }
             return done;
         }
         static (int, Dictionary<State, int>, int) GetMaxPressure(List<string> input, int minutes, bool tryAll)
         {
-            var fullDict = new Dictionary<string, (int rate, List<NameTunnel> tunnels)>();
+            Dictionary<string, (int rate, List<NameTunnel> tunnels)> fullDict = new(), nameDict = new();
             foreach (var s in input)
             {
                 var v = s.Replace(',', ' ').Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -59,11 +52,9 @@ namespace aoc
                 fullDict[v[1]] = (n, list);
             }
             // Only keep "AA" and valves with rate > 0
-            var nameDict = new Dictionary<string, (int rate, List<NameTunnel> tunnels)>();
             foreach (var k in fullDict.Keys)
                 if (fullDict[k].rate > 0 || k == "AA")
                     nameDict[k] = (fullDict[k].rate, GetEffectiveTunnels(k, fullDict));
-            int nValves = nameDict.Count;
             valveNamesList = nameDict.Keys.OrderBy(k => k).ToList();
             valveNameToIdx = valveNamesList.ToDictionary(w => w, w => valveNamesList.IndexOf(w));
             int allIdValvesMask = 0;
@@ -77,17 +68,14 @@ namespace aoc
             }
             int[] idxRates = idxDict.OrderBy(w => w.Key).Select(w => w.Value.rate).ToArray();
             int[] idxMinCosts = idxDict.OrderBy(w => w.Key).Select(w => w.Value.minCost).ToArray();
-            var pressure = new Dictionary<State, int>();
-            var toTest = new Queue<State>();
-            State state0 = new(valveNameToIdx["AA"], minutes, 1);
-            pressure[state0] = 0;
-            toTest.Enqueue(state0);
+            var toTest = new Queue<State>(new[] { new State(valveNameToIdx["AA"], minutes, 1) });
+            var pressure = new Dictionary<State, int>() { { toTest.Peek(), 0 } };
             int maxPressure = 0;
             while (toTest.TryDequeue(out State cur))
             {
                 if (cur.time <= 0)
                     continue;
-                List<(State, int)> next = new();
+                var next = new List<(State, int)>();
                 // Open valve?
                 if ((cur.open & (1 << cur.idx)) == 0)
                    next.Add((new(cur.idx, cur.time - 1, cur.open | (1 << cur.idx)), pressure[cur] + idxDict[cur.idx].rate * (cur.time - 1)));
@@ -99,7 +87,7 @@ namespace aoc
                 foreach (var (s, p) in next)
                 {
                     int bestFuturePressure = tryAll ? int.MaxValue : p;
-                    for (int i = 1; i < nValves && !tryAll; i++)
+                    for (int i = 1; i < idxDict.Count && !tryAll; i++)
                         if ((s.open & (1 << i)) == 0)
                             bestFuturePressure += idxRates[i] * (s.time - idxMinCosts[s.idx]);
                     if ((!pressure.ContainsKey(s) || pressure[s] < p) && bestFuturePressure > maxPressure)
@@ -120,10 +108,10 @@ namespace aoc
             var (a, _, _) = GetMaxPressure(input, 30, false);
             var (_, pressure, allMask) = GetMaxPressure(input, 26, true);
             Dictionary<int, int> op = new();
-            foreach (var p in pressure)
+            foreach (var (k, v) in pressure)
             {
-                int open = p.Key.open & (allMask - 1);
-                op[open] = op.ContainsKey(open) ? Math.Max(p.Value, op[open]) : p.Value;
+                int open = k.open & (allMask - 1);
+                op[open] = op.ContainsKey(open) ? Math.Max(v, op[open]) : v;
             }
             int b = 0;
             var opList = op.OrderByDescending(s => s.Value).ToList();
@@ -135,14 +123,11 @@ namespace aoc
                 for (int j = i + 1; j < opList.Count; j++)
                 {
                     var elephant = opList[j];
-                    if ((me.Key & elephant.Key) == 0)
-                    {
-                        int p = me.Value + elephant.Value;
-                        if (p > b)
-                            b = p;
+                    if ((me.Key & elephant.Key) == 0) // Valves opened disjoint
+                        if (me.Value + elephant.Value > b)
+                            b = me.Value + elephant.Value;
                         else
                             break;
-                    }
                 }
             }
             return (a, b);
