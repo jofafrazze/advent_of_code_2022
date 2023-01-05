@@ -27,63 +27,76 @@ namespace aoc
             int vyMin = 1;
             int vyMax = map.height - 2;
             var nextValley = new Dictionary<Pos, List<char>>();
-            foreach (var (p, b) in valley)
+            foreach (var (pp, b) in valley)
             {
                 foreach (var c in b)
                 {
-                    Pos newPos = p + dirs[bChars.IndexOf(c)];
-                    if (newPos.x < vxMin)
-                        newPos.x += vWidth;
-                    else if (newPos.x > vxMax)
-                        newPos.x -= vWidth;
-                    else if (newPos.y < vyMin)
-                        newPos.y += vHeight;
-                    else if (newPos.y > vyMax)
-                        newPos.y -= vHeight;
-                    if (!nextValley.ContainsKey(newPos))
-                        nextValley[newPos] = new List<char>();
-                    nextValley[newPos].Add(c);
+                    //Pos newPos = p + dirs[bChars.IndexOf(c)];
+                    Pos p = pp;
+                    if (c == '^')
+                        p.y--;
+                    else if (c == '>')
+                        p.x++;
+                    else if (c == 'v')
+                        p.y++;
+                    else if (c == '<')
+                        p.x--;
+                    if (p.x < vxMin)
+                        p.x += vWidth;
+                    else if (p.x > vxMax)
+                        p.x -= vWidth;
+                    else if (p.y < vyMin)
+                        p.y += vHeight;
+                    else if (p.y > vyMax)
+                        p.y -= vHeight;
+                    if (!nextValley.ContainsKey(p))
+                        nextValley[p] = new List<char>(4) { c };
+                    else
+                        nextValley[p].Add(c);
                 }
             }
             return nextValley;
         }
         static string bChars = "^>v<";
         static List<Pos> dirs = new() { CoordsRC.up, CoordsRC.right, CoordsRC.down, CoordsRC.left, new Pos(0, 0) };
-        static int WalkMap(Pos start, Pos end, int startMinute, Map map)
+        static List<Dictionary<Pos, List<char>>> CreateBlizzards(Map map)
         {
             var validPos = map.Positions().Where(w => map[w] != '#').ToHashSet();
             var initialBlizzards = validPos.Where(w => map[w] != '.');
             var valley = initialBlizzards.ToDictionary(w => w, w => new List<char>() { map[w] });
-            HashSet<Pos> positions = new() { start };
+            int w = map.width - 2;
+            int h = map.height - 2;
+            int lcm = (int)Utils.LCM(w, h);
+            var blizzards = new List<Dictionary<Pos, List<char>>>(lcm) { valley };
+            for (int n = 1; n < lcm; n++)
+                blizzards.Add(StepBlizzards(blizzards.Last(), map));
+            return blizzards;
+        }
+        static int WalkMap(Pos start, Pos end, int startMinute, Map map, List<Dictionary<Pos, List<char>>> blizzards)
+        {
+            var validPos = map.Positions().Where(w => map[w] != '#').ToHashSet();
+            var positions = new HashSet<Pos>() { start };
             bool done = false;
             //PrintValley(valley, map, positions, i);
             int w = map.width - 2;
             int h = map.height - 2;
-            int lcm = (int)Utils.LCM(w, h);
-            int initStep = startMinute % lcm;
-            for (int n = 0; n < initStep; n++)
-                valley = StepBlizzards(valley, map);
             int i = startMinute;
             while (!done)
             {
                 i++;
-                var nextValley = StepBlizzards(valley, map);
-                HashSet<Pos> nextPositions = new();
+                var valley = blizzards[i % blizzards.Count];
+                var nextPositions = new HashSet<Pos>();
                 foreach (var p in positions)
-                {
                     foreach (var d in dirs)
                     {
                         Pos np = p + d;
-                        if (validPos.Contains(np) && !nextValley.ContainsKey(np))
+                        if (!valley.ContainsKey(np) && validPos.Contains(np))
                         {
                             nextPositions.Add(np);
                             if (np == end)
                                 done = true;
                         }
                     }
-                }
-                var vDebug = nextPositions.OrderBy(w => w.x).ThenByDescending(w => w.y).ToList();
-                valley = nextValley;
                 positions = nextPositions;
                 //PrintValley(valley, map, positions, i);
             }
@@ -93,11 +106,12 @@ namespace aoc
         {
             var input = ReadInput.Strings(Day, file);
             var map = Map.Build(input);
+            var blizzards = CreateBlizzards(map);
             Pos start = new(1, 0);
             Pos end = new(map.width - 2, map.height - 1);
-            int a = WalkMap(start, end, 0, map);
-            int b0 = WalkMap(end, start, a, map);
-            int b = WalkMap(start, end, b0, map);
+            int a = WalkMap(start, end, 0, map, blizzards);
+            int b0 = WalkMap(end, start, a, map, blizzards);
+            int b = WalkMap(start, end, b0, map, blizzards);
             return (a, b);
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle);
