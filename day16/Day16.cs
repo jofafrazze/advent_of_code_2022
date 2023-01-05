@@ -1,236 +1,150 @@
 ﻿using AdventOfCode;
+using System.Linq;
 using System.Reflection;
-
+using System.Text;
 
 namespace aoc
 {
-	static class HelpF
-	{
-		// Split a string into separate strings, as specified by the delimiter.
-		public static string[] SplitToStringArray(this string str, string split, bool removeEmpty)
-		{
-			return str.Split(new string[] { split }, removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-		}
-		public static string[] SplitToStringArray(this string str, char[] split, bool removeEmpty)
-		{
-			return str.Split(split, removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-		}
-		public static V Read<K, V>(this Dictionary<K, V> dict, K key)
-		{
-			if (dict.ContainsKey(key)) return dict[key];
-			return default(V);
-		}
-		public static V Read<K, V>(this Dictionary<K, V> dict, K key, V def)
-		{
-			if (dict.ContainsKey(key)) return dict[key];
-			return def;
-		}
-	}
-	public class Day16
+    public class Day16
     {
-		static (int, int) Day16_Run(List<string> input)
-		{
-			var valves = new Dictionary<string, (int Rate, string[] Leads)>();
-			var valves2 = new Dictionary<int, (int Rate, (int Destination, int Cost)[] Leads)>();
-
-			foreach (var line in input)
-			{
-				var split = line.SplitToStringArray(new char[] { ' ', ',', ';', '=' }, true);
-				string valve = split[1];
-				int rate = int.Parse(split[5]);
-				int count = split.Length - 10;
-				string[] leads = new string[count];
-				Array.Copy(split, 10, leads, 0, count);
-				valves[valve] = (rate, leads);
-			}
-
-			int maxRate = valves.Sum(v => v.Value.Rate);
-			int maxValves = valves.Count(v => v.Value.Rate > 0);
-
-			foreach (var valve in valves.Where(v => v.Value.Rate > 0 || v.Key == "AA"))
-			{
-				var destinations = new List<(int Destination, int Cost)>();
-
-				foreach (var dest in valves.Where(v => v.Value.Rate > 0 && v.Key != valve.Key))
-				{
-					var visited = new Dictionary<string, int>();
-					visited[valve.Key] = 0;
-
-					var find = new Queue<(string Node, int Cost)>();
-					var findNext = new Queue<(string Node, int Cost)>();
-					find.Enqueue((valve.Key, 0));
-					while (find.Count > 0)
-					{
-						(string node, int cost) = find.Dequeue();
-						foreach (var lead in valves[node].Leads)
-						{
-							tryGo(node, cost, lead);
-						}
-						if (find.Count == 0) (find, findNext) = (findNext, find);
-					}
-
-					void tryGo(string from, int price, string to)
-					{
-						int check = visited.Read(to, int.MaxValue);
-						if (price + 1 >= check) return;
-						visited[to] = price + 1;
-						findNext.Enqueue((to, price + 1));
-					}
-					int key2 = (dest.Key[0] - 'A') | (dest.Key[1] - 'A') << 16;
-					destinations.Add((key2, visited[dest.Key]));
-				}
-				int key = (valve.Key[0] - 'A') | (valve.Key[1] - 'A') << 16;
-				valves2[key] = (valve.Value.Rate, destinations.ToArray());
-			}
-
-			var valveMask = new Dictionary<int, uint>();
-			uint mask = 1;
-			foreach (var item in valves2)
-			{
-				valveMask[item.Key] = mask;
-				mask <<= 1;
-			}
-
-			var cache = new Dictionary<(int Minute, int Cooldown, int Location, uint Path), int>();
-			var x = dfs(0, 0, 0, 0, 0, 0, 0, 0);
-			int ansA = x;
-			Console.WriteLine($"Part 1: {x}");
-			int dfs(int location, uint path, int cooldown, uint enableMask, int rate, int total, int moves, int enabled)
-			{
-				int premod = cooldown;
-				int cached = cache.Read((moves, cooldown, location, path), -1);
-				if (cached != -1) return rate + cached;
-
-				var exploreables = new List<(int location, int boost, int cost)>();
-				var exploreablesP2 = new List<(int location, int boost, int cost)>();
-
-				int best = 0;
-
-				if (moves < 29)
-				{
-					if (cooldown > 0)
-					{
-						cooldown--;
-					}
-					if (cooldown <= 0)
-					{
-						if (valves2[location].Rate != 0 && (enableMask & valveMask[location]) == 0)
-						{
-							rate += valves2[location].Rate;
-							enableMask |= valveMask[location];
-						}
-						foreach (var (Destination, Cost) in valves2[location].Leads)
-						{
-							if ((path & valveMask[Destination]) != 0) continue;
-							exploreables.Add((Destination, 0, Cost + 1));
-						}
-					}
-					if (exploreables.Count == 0)
-					{
-						exploreables.Add((location, 0, 0));
-					}
-					foreach (var act in exploreables)
-					{
-						if (moves == 0)
-						{
-							//WriteLine($"{act.path}: {watch.Elapsed}");
-						}
-						int turned = Math.Sign(act.boost);
-						best = Math.Max(best, dfs(act.location, path | valveMask[act.location], cooldown + act.cost, enableMask | (act.boost > 0 ? valveMask[location] : 0), rate + act.boost, total, moves + 1, enabled + turned));
-					}
-				}
-
-				cache[(moves, premod, location, path)] = best; // Math.Max(best, cache.Read((moves, location, cooldown, locationP2, cooldownP2, enableMask)));
-				return rate + best;
-			}
-			cache.Clear();
-			int bestScore = 0;
-			var cache2 = new Dictionary<(int Minute, int Cooldown, int Location, int CooldownP2, int LocationP2, uint Path), bool>();
-			dfs2(0, 0, 0, 0, 0, 0, 0, 0, 0);
-			int ansB = bestScore;
-			Console.WriteLine($"Part 2: {bestScore}");
-			void dfs2(int location, uint path, int cooldown, int locationP2, uint pathP2, int cooldownP2, uint enableMask, int total, int moves)
-			{
-				bool cached = cache2.Read((moves, cooldown, location, cooldownP2, locationP2, path));
-				if (cached) return;
-				bestScore = Math.Max(bestScore, total);
-				var exploreables = new List<(int location, int path, int boost, int cost)>();
-				var exploreablesP2 = new List<(int location, int path, int boost, int cost)>();
-
-				int remainingTurns = 26 - moves;
-
-				if (moves < 25)
-				{
-					if (cooldown > 0)
-					{
-						cooldown--;
-					}
-					if (cooldown <= 0)
-					{
-						if (valves2[location].Rate != 0 && (enableMask & valveMask[location]) == 0)
-						{
-							enableMask |= valveMask[location];
-						}
-						foreach (var (Destination, Cost) in valves2[location].Leads)
-						{
-							if (((path | pathP2) & valveMask[Destination]) != 0) continue;
-							exploreables.Add((Destination, Destination, valves2[Destination].Rate, Cost + 1));
-						}
-					}
-					if (cooldownP2 > 0)
-					{
-						cooldownP2--;
-					}
-					if (cooldownP2 <= 0)
-					{
-						if (valves2[locationP2].Rate != 0 && (enableMask & valveMask[locationP2]) == 0)
-						{
-							enableMask |= valveMask[locationP2];
-						}
-						foreach (var (Destination, Cost) in valves2[locationP2].Leads)
-						{
-							if (((path | pathP2) & valveMask[Destination]) != 0) continue;
-							exploreablesP2.Add((Destination, Destination, valves2[Destination].Rate, Cost + 1));
-						}
-					}
-
-					if (exploreables.Count == 0)
-					{
-						exploreables.Add((location, location, 0, 0));
-					}
-					if (exploreablesP2.Count == 0)
-					{
-						exploreablesP2.Add((locationP2, locationP2, 0, 0));
-					}
-					foreach (var act in exploreables)
-					{
-						if (moves == 0)
-						{
-							cache2.Clear();
-						}
-
-						foreach (var actP2 in exploreablesP2)
-						{
-							if (act.path == actP2.path) continue;
-							int turned = Math.Sign(act.boost) + Math.Sign(actP2.boost);
-
-							int newTotal = total + act.boost * Math.Max(0, remainingTurns - act.cost) + actP2.boost * Math.Max(0, remainingTurns - actP2.cost);
-
-							dfs2(act.location, path | valveMask[act.path], cooldown + act.cost, actP2.location, pathP2 | valveMask[actP2.path], cooldownP2 + actP2.cost, enableMask | (act.boost > 0 ? valveMask[location] : 0) | (actP2.boost > 0 ? valveMask[locationP2] : 0), newTotal, moves + 1);
-						}
-					}
-				}
-
-				// I've no idea what the heck is wrong with this cache. It's useless. As such, I'm only using it to stop early here.
-				cache2[(moves + 1, cooldown, location, cooldownP2, locationP2, path)] = true;
-			}
-			return (ansA, ansB);
-		}        
-		// Proboscidea Volcanium: 
-		public static (Object a, Object b) DoPuzzle(string file)
+        // Proboscidea Volcanium: 
+        struct NameTunnel { public string valve; public int cost; public NameTunnel(string v, int c) { valve = v; cost = c; } }
+        struct IdTunnel { public int valve; public int cost; public IdTunnel(int v, int c) { valve = v; cost = c; } }
+        static List<string> valveNamesList = new();
+        static Dictionary<string, int> valveNameToIdx = new();
+        struct State : IEquatable<State>
+        {
+            public int idx;     // Valve idx, 0 indexed
+            public int time;    // minutes left in state
+            public int open;    // Bits to indicate which valves are open
+            public State(int i, int t, int o) { idx = i; time = t; open = o; }
+            public override bool Equals(object? obj) => obj != null && obj is State other && Equals(other);
+            public bool Equals(State s) => idx == s.idx && time == s.time && open == s.open;
+            public override int GetHashCode() => HashCode.Combine(idx, time, open);
+        }
+        static List<NameTunnel> GetEffectiveTunnels(string valveName, Dictionary<string, (int rate, List<NameTunnel> tunnels)> dict)
+        {
+            var tunnels = dict[valveName].tunnels.ToList();
+            List<NameTunnel> done = tunnels.Where(z => dict[z.valve].rate > 0 || z.valve == "AA").ToList();
+            List<NameTunnel> todo = tunnels.Except(done).ToList();
+            HashSet<string> visited = new() { valveName };
+            while (todo.Any())
+            {
+                NameTunnel t = todo[0];
+                visited.Add(t.valve);
+                todo.RemoveAt(0);
+                List<NameTunnel> step = dict[t.valve].tunnels.Select(z => new NameTunnel(z.valve, t.cost + 1)).ToList();
+                foreach (NameTunnel t2 in step)
+                    if (dict[t2.valve].rate == 0 && t2.valve != "AA")
+                    {
+                        if (!visited.Contains(t2.valve))
+                            todo.Add(new NameTunnel(t2.valve, t2.cost));
+                    }
+                    else
+                        if (!done.Where(z => z.valve == t2.valve).Any() && t2.valve != valveName)
+                            done.Add(t2);
+            }
+            return done;
+        }
+        static (int, Dictionary<State, int>, int) GetMaxPressure(List<string> input, int minutes, bool tryAll)
+        {
+            var fullDict = new Dictionary<string, (int rate, List<NameTunnel> tunnels)>();
+            foreach (var s in input)
+            {
+                var v = s.Replace(',', ' ').Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                int n = Extract.Ints(s)[0];
+                List<NameTunnel> list = new();
+                for (int i = 9; i < v.Length; i++)
+                    list.Add(new NameTunnel(v[i], 1));
+                fullDict[v[1]] = (n, list);
+            }
+            // Only keep "AA" and valves with rate > 0
+            var nameDict = new Dictionary<string, (int rate, List<NameTunnel> tunnels)>();
+            foreach (var k in fullDict.Keys)
+                if (fullDict[k].rate > 0 || k == "AA")
+                    nameDict[k] = (fullDict[k].rate, GetEffectiveTunnels(k, fullDict));
+            int nValves = nameDict.Count;
+            valveNamesList = nameDict.Keys.OrderBy(k => k).ToList();
+            valveNameToIdx = valveNamesList.ToDictionary(w => w, w => valveNamesList.IndexOf(w));
+            int allIdValvesMask = 0;
+            for (int i = 0; i < valveNamesList.Count; i++)
+                allIdValvesMask |= 1 << i;
+            var idxDict = new Dictionary<int, (int rate, List<IdTunnel> tunnels, int minCost)>();
+            foreach (var (k, v) in nameDict)
+            {
+                var tunnels = v.tunnels.Select(w => new IdTunnel(valveNameToIdx[w.valve], w.cost)).ToList();
+                idxDict[valveNameToIdx[k]] = (v.rate, tunnels, tunnels.Select(w => w.cost).Min());
+            }
+            int[] idxRates = idxDict.OrderBy(w => w.Key).Select(w => w.Value.rate).ToArray();
+            int[] idxMinCosts = idxDict.OrderBy(w => w.Key).Select(w => w.Value.minCost).ToArray();
+            var pressure = new Dictionary<State, int>();
+            var toTest = new Queue<State>();
+            State state0 = new(valveNameToIdx["AA"], minutes, 1);
+            pressure[state0] = 0;
+            toTest.Enqueue(state0);
+            int maxPressure = 0;
+            while (toTest.TryDequeue(out State cur))
+            {
+                if (cur.time <= 0)
+                    continue;
+                List<(State, int)> next = new();
+                // Open valve?
+                if ((cur.open & (1 << cur.idx)) == 0)
+                   next.Add((new(cur.idx, cur.time - 1, cur.open | (1 << cur.idx)), pressure[cur] + idxDict[cur.idx].rate * (cur.time - 1)));
+                // Just move on?
+                if ((cur.open & allIdValvesMask) != allIdValvesMask)
+                    foreach (var to in idxDict[cur.idx].tunnels)
+                        if (cur.time > to.cost)
+                            next.Add((new(to.valve, cur.time - to.cost, cur.open), pressure[cur]));
+                foreach (var (s, p) in next)
+                {
+                    int bestFuturePressure = tryAll ? int.MaxValue : p;
+                    for (int i = 1; i < nValves && !tryAll; i++)
+                        if ((s.open & (1 << i)) == 0)
+                            bestFuturePressure += idxRates[i] * (s.time - idxMinCosts[s.idx]);
+                    if ((!pressure.ContainsKey(s) || pressure[s] < p) && bestFuturePressure > maxPressure)
+                    {
+                        toTest.Enqueue(s);
+                        pressure[s] = p;
+                        if (p > maxPressure)
+                            maxPressure = p;
+                    }
+                }
+            }
+            //Console.WriteLine("Tested {0} states in total.", pressure.Count);
+            return (maxPressure, pressure, allIdValvesMask);
+        }
+        public static (Object a, Object b) DoPuzzle(string file)
         {
             var input = ReadInput.Strings(Day, file);
-			(int a, int b) = Day16_Run(input);
+            var (a, _, _) = GetMaxPressure(input, 30, false);
+            var (_, pressure, allMask) = GetMaxPressure(input, 26, true);
+            Dictionary<int, int> op = new();
+            foreach (var p in pressure)
+            {
+                int open = p.Key.open & (allMask - 1);
+                op[open] = op.ContainsKey(open) ? Math.Max(p.Value, op[open]) : p.Value;
+            }
+            int b = 0;
+            var opList = op.OrderByDescending(s => s.Value).ToList();
+            for (int i = 0; i < opList.Count; i++)
+            { 
+                var me = opList[i];
+                if (me.Value < b / 2)
+                    break;
+                for (int j = i + 1; j < opList.Count; j++)
+                {
+                    var elephant = opList[j];
+                    if ((me.Key & elephant.Key) == 0)
+                    {
+                        int p = me.Value + elephant.Value;
+                        if (p > b)
+                            b = p;
+                        else
+                            break;
+                    }
+                }
+            }
             return (a, b);
         }
         static void Main() => Aoc.Execute(Day, DoPuzzle, false);
