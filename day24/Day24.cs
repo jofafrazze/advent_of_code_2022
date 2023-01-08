@@ -59,48 +59,54 @@ namespace aoc
         }
         static string bChars = "^>v<";
         static List<Pos> dirs = new() { CoordsRC.up, CoordsRC.right, CoordsRC.down, CoordsRC.left, new Pos(0, 0) };
-        static List<Dictionary<Pos, List<char>>> CreateBlizzards(Map map)
+        static List<HashSet<Pos>> CreateBlizzards(Map map)
         {
             var validPos = map.Positions().Where(w => map[w] != '#').ToHashSet();
-            var initialBlizzards = validPos.Where(w => map[w] != '.');
-            var valley = initialBlizzards.ToDictionary(w => w, w => new List<char>() { map[w] });
+            List<List<Pos>> GenerateBlizzards1D(char c1, char c2, int n)
+            {
+                var initialBlizzards = validPos.Where(w => map[w] == c1 || map[w] == c2);
+                var valley = initialBlizzards.ToDictionary(w => w, w => new List<char>() { map[w] });
+                var b = new List<List<Pos>>(n);
+                for (int i = 0; i < n; i++)
+                {
+                    b.Add(valley.Keys.ToList());
+                    valley = StepBlizzards(valley, map);
+                }
+                return b;
+            }
             int w = map.width - 2;
             int h = map.height - 2;
+            var blizzardsHz = GenerateBlizzards1D('<', '>', w);
+            var blizzardsVc = GenerateBlizzards1D('^', 'v', h);
             int lcm = (int)Utils.LCM(w, h);
-            var blizzards = new List<Dictionary<Pos, List<char>>>(lcm) { valley };
-            for (int n = 1; n < lcm; n++)
-                blizzards.Add(StepBlizzards(blizzards.Last(), map));
+            var blizzards = new List<HashSet<Pos>>(lcm);
+            for (int n = 0; n < lcm; n++)
+                blizzards.Add(blizzardsHz[n % w].Union(blizzardsVc[n % h]).ToHashSet());
             return blizzards;
         }
-        static int WalkMap(Pos start, Pos end, int startMinute, Map map, List<Dictionary<Pos, List<char>>> blizzards)
+        static int WalkMap(Pos start, Pos end, int startMinute, Map map, List<HashSet<Pos>> blizzards)
         {
             var validPos = map.Positions().Where(w => map[w] != '#').ToHashSet();
-            var positions = new HashSet<Pos>() { start };
-            bool done = false;
+            var visited = new HashSet<(Pos, int)>() { (start, startMinute) };
+            var toTry = new PriorityQueue<(Pos p, int minute), int>(new ((Pos, int), int)[] { ((start, startMinute), 0) });
             //PrintValley(valley, map, positions, i);
             int w = map.width - 2;
             int h = map.height - 2;
-            int i = startMinute;
-            while (!done)
+            while (toTry.TryDequeue(out var v, out int _))
             {
-                i++;
-                var valley = blizzards[i % blizzards.Count];
-                var nextPositions = new HashSet<Pos>();
-                foreach (var p in positions)
-                    foreach (var d in dirs)
-                    {
-                        Pos np = p + d;
-                        if (!valley.ContainsKey(np) && validPos.Contains(np))
-                        {
-                            nextPositions.Add(np);
-                            if (np == end)
-                                done = true;
-                        }
-                    }
-                positions = nextPositions;
+                if (v.p == end)
+                    return v.minute;
+                var valley = blizzards[(v.minute + 1) % blizzards.Count];
+                foreach (var d in dirs)
+                {
+                    Pos np = v.p + d;
+                    if (!valley.Contains(np) && validPos.Contains(np))
+                        if (visited.Add((np, v.minute + 1)))
+                            toTry.Enqueue((np, v.minute + 1), v.minute + 1 + v.p.ManhattanDistance(end));
+                }
                 //PrintValley(valley, map, positions, i);
             }
-            return i;
+            throw new Exception("No path to end found!");
         }
         public static (Object a, Object b) DoPuzzle(string file)
         {
