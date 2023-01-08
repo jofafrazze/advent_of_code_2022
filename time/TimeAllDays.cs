@@ -53,6 +53,14 @@
             WriteToTextWriter(log, Console.WriteLine, str);
             WriteToTextWriter(tmp, Console.WriteLine, str);
         }
+        static int Median(List<int> nums)
+        {
+            if (nums.Count == 0)
+                return 0;
+            nums = nums.OrderBy(n => n).ToList();
+            var i = nums.Count / 2;
+            return nums.Count % 2 == 1 ? nums[i] : (nums[i] + nums[i - 1]) / 2;
+        }
         static void Main()
         {
             string dir = Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.Parent!.FullName;
@@ -73,6 +81,11 @@
             stats = stats.OrderBy(w => w.ms).ToList();
             foreach (var (day, ms) in stats)
                 LogLine(log, $"Day {day,2:00}: {ms,5} ms");
+            var times = stats.Select(w => w.ms).ToList();
+            int total = times.Sum();
+            int mean = total / times.Count;
+            int median = Median(times);
+            LogLine(log, $"Mean: {mean} ms, median: {median} ms, total: {total} ms.");
             log.Close();
         }
     }
