@@ -30,34 +30,6 @@
             aoc.Day24.DoPuzzle,
             aoc.Day25.DoPuzzle,
         };
-        //static readonly List<Action> days = new()
-        //{
-        //    test.TestDay01.Test,
-        //    test.TestDay02.Test,
-        //    test.TestDay03.Test,
-        //    test.TestDay04.Test,
-        //    test.TestDay05.Test,
-        //    test.TestDay06.Test,
-        //    test.TestDay07.Test,
-        //    test.TestDay08.Test,
-        //    test.TestDay09.Test,
-        //    test.TestDay10.Test,
-        //    test.TestDay11.Test,
-        //    test.TestDay12.Test,
-        //    test.TestDay13.Test,
-        //    test.TestDay14.Test,
-        //    test.TestDay15.Test,
-        //    test.TestDay16.Test,
-        //    test.TestDay17.Test,
-        //    test.TestDay18.Test,
-        //    test.TestDay19.Test,
-        //    test.TestDay20.Test,
-        //    test.TestDay21.Test,
-        //    test.TestDay22.Test,
-        //    test.TestDay23.Test,
-        //    test.TestDay24.Test,
-        //    test.TestDay25.Test,
-        //};
         public static bool IsDebug =>
 #if DEBUG
                 true;
@@ -81,7 +53,7 @@
             WriteToTextWriter(log, Console.WriteLine, str);
             WriteToTextWriter(tmp, Console.WriteLine, str);
         }
-        static int Median(List<int> nums)
+        static double Median(List<double> nums)
         {
             if (nums.Count == 0)
                 return 0;
@@ -97,29 +69,32 @@
             string now = DateTime.Now.ToString("yyyy-M-dd_HH-mm-ss");
             StreamWriter log = new(dir + $"\\log\\TimeAoC2022_{buildConf}_{now}.txt");
             LogLine(log, $"Running all {days.Count} days in {buildConf} configuration ({nRuns} runs each): ");
-            List<(int day, int ms)> stats = new();
+            List<(int day, double ms)> stats = new();
             for (int i = 1; i <= days.Count; i++)
             {
                 Log(log, $"{i},");
-                var runsMs = new List<long>();
+                var runsUs = new List<double>();
                 for (int n = 0; n < nRuns; n++)
                 {
                     var w = System.Diagnostics.Stopwatch.StartNew();
                     days[i - 1](test.Input.actual);
                     w.Stop();
-                    runsMs.Add(w.ElapsedMilliseconds);
+                    runsUs.Add(w.ElapsedTicks / ((double)TimeSpan.TicksPerMillisecond));
                 }
-                stats.Add((i, (int)runsMs.Min()));
+                stats.Add((i, runsUs.Min()));
             }
             LogLine(log, "done.");
             stats = stats.OrderBy(w => w.ms).ToList();
             foreach (var (day, ms) in stats)
-                LogLine(log, $"Day {day,2:00}: {ms,5} ms");
+            {
+                string s = (ms < 1) ? $"{Math.Round(ms * 1000),5} us" : $"{Math.Round(ms),5} ms";
+                LogLine(log, $"Day {day,2:00}: {s}");
+            }
             var times = stats.Select(w => w.ms).ToList();
-            int total = times.Sum();
-            int mean = total / times.Count;
-            int median = Median(times);
-            LogLine(log, $"Mean: {mean} ms, median: {median} ms, total: {total} ms.");
+            double total = Math.Round(times.Sum());
+            double mean = Math.Round(total / times.Count);
+            double median = Math.Round(Median(times));
+            LogLine(log, $"Median: {median} ms, mean: {mean} ms, total: {total} ms.");
             log.Close();
         }
     }
